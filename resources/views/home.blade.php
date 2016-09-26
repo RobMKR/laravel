@@ -14,8 +14,10 @@
                         <strong>Author Email: </strong>{{$book->user->email}} |
                         <strong>Created: </strong>{{$book->created_at}} 
                     </span>
-                    <a href="{{url('/books/editBook/' . Hashids::encode($book->id))}}" class="glyphicon glyphicon-pencil"></a>
-                    <a href="{{url('/books/deleteBook/' . Hashids::encode($book->id))}}" class="glyphicon glyphicon-remove"></a>
+                    @if(Auth::user()->getLevel())
+                        <a href="{{url('/books/editBook/' . Hashids::encode($book->id))}}" class="glyphicon glyphicon-pencil"></a>
+                        <a href="{{url('/books/deleteBook/' . Hashids::encode($book->id))}}" class="glyphicon glyphicon-remove"></a>
+                    @endif
                 </li>
             @endforeach
         </div>
