@@ -40,8 +40,11 @@ class User extends Authenticatable
     /**
      * Getting User role level, highest level is the super admin
      */
-    public function getLevel(){
-        switch($this->role){
+    public function getLevel($role = NULL){
+        if(!$role){
+            $role = $this->role;
+        }
+        switch($role){
             case 'superadmin' :
                 return 3;
             case 'admin':

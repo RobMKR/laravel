@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Laravel - Home')
+
 @section('content')
 <div class="container">
     @if(!empty($data['my_books']))

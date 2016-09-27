@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Book as Book;
+use LRedis;
 
 class HomeController extends Controller
 {
@@ -25,5 +26,16 @@ class HomeController extends Controller
     public function index(){   
         $viewData =  Book::separeteBooks(Book::all(), Auth::user()->id);
         return view('home')->with('data', $viewData);
+    }
+
+    public function chat(){   
+        return view('chat');
+    }
+
+    public function sendMessage(Request $request){
+        $redis = LRedis::connection();
+        $data = ['message' => $request->input('message'), 'user' => $request->input('user')];
+        $redis->publish('message', json_encode($data));
+        return response()->json([]);
     }
 }

@@ -16,7 +16,7 @@
                 </div>
                 <div class="text-center">
                     <h6>User Email</h6>
-                   {!! Form::text('email', null , array('placeholder'=>'Picture Description', 'class' =>'form-control')) !!}
+                   {!! Form::text('email', null , array('placeholder'=>'User Email', 'class' =>'form-control')) !!}
                 </div>
                 <div class="form-group text-center">
                     <h6>User Role</h6>

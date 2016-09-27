@@ -15,17 +15,18 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Auth + Books Middleware
 
-// Auth middleware
-Route::group(['middleware' => ['auth']], function () {
+Route::group(['middleware' => ['auth','book']], function () {
     Route::get('/books/addBook', 'BooksController@addBook');
     Route::post('/books/addBook', 'BooksController@addBook');
-    Route::get('/books/editBooks', 'BooksController@editBooks');
-    Route::post('/books/editBooks', 'BooksController@editBooks');
+    Route::get('/books/editBook/{id}', 'BooksController@editBook');
+    Route::post('/books/editBook/{id}', 'BooksController@editBook');
+    Route::get('/books/deleteBook/{id}', 'BooksController@deleteBook');
 });
 
 // Auth + Admin Middlwares
-Route::group(['middleware' => ['auth', 'admin']], function () {
+Route::group(['middleware' => ['auth','admin']], function () {
     Route::get('/admin', 'AdminController@index');
     Route::get('/admin/editUser/{id}', 'AdminController@editUser');
     Route::get('/admin/deleteUser/{id}', 'AdminController@deleteUser');
@@ -37,3 +38,5 @@ Route::group(['middleware' => ['auth', 'admin']], function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');
+Route::get('/chat', 'HomeController@chat');
+Route::post('sendmessage', 'HomeController@sendMessage');

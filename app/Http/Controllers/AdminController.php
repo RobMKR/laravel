@@ -10,42 +10,19 @@ use App\User as User;
 use App\Http\Requests;
 use Validator;
 use Session;
-use Vinkla\Hashids\Facades\Hashids as Hashids;
 
 class AdminController extends Controller
 {	
-	/**
-     * return Decoded Id
-     *
-     * @param string
-     */
-	private function decode($id){
-		$id = Hashids::decode($id);
-    	if(!empty($id)){
-    		return $id[0];
-    	}else{
-    		return 0;
-    	}
-	}
-
-	/**
-     * return Encoded Id
-     *
-     * @param string
-     */
-	private function encode($id){
-		return Hashids::encode($id);
-	}
 
 	public function index(){
     	// Getting User Level
     	$user_level = Auth::user()->getLevel();
     	switch($user_level){
     		case 2:
-    			$users = User::where('role', ['user'])->get();
+    			$users = User::whereIn('role', ['user','author'])->get();
     			break;
     		case 3:
-    			$users = User::whereIn('role', ['user','admin'])->get();
+    			$users = User::whereIn('role', ['user','author','admin'])->get();
     			break;
 			default:
 				$users = [];
@@ -70,7 +47,7 @@ class AdminController extends Controller
     		$this->validate($request, [
 	            'name' => 'required|max:255',
 	            'email' => 'required|email|max:255|unique:users,email,'.$id,
-	            'role' => 'required|in:user,admin,superadmin',
+	            'role' => 'required|in:user,admin,superadmin,author',
 	        ]);
 
 	        if (!$user->update(Input::all())) {
@@ -87,7 +64,7 @@ class AdminController extends Controller
     	$viewData['user'] = $user;
 
     	// Getting Available Roles for User
-    	$viewData['roles'] = User::getRoles($user->role);
+    	$viewData['roles'] = User::getRoles(Auth::user()->role);
 
     	return view('admin/edit_user')->with('data', $viewData);
     }
@@ -100,7 +77,7 @@ class AdminController extends Controller
 		$user = User::find($id);
 
 		// Redirect with errors, if incorrect id has passed
-    	if(empty($user)){
+    	if(empty($user) || Auth::user()->getLevel($user->role) > Auth::user()->getLevel()){
     		return Redirect::back()->withErrors(['User Not Found']);
     	}
 

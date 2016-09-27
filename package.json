@@ -14,5 +14,10 @@
     "lodash": "^4.14.0",
     "vue": "^1.0.26",
     "vue-resource": "^0.9.3"
+  },
+  "dependencies": {
+    "express": "^4.14.0",
+    "redis": "^2.6.2",
+    "socket.io": "^1.4.8"
   }
 }
