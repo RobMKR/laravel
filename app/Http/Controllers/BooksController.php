@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Input;
 use App\Book as Book;
+use App\NotificationLog as Log;
 use App\Http\Requests;
 use Session;
 
@@ -27,10 +28,25 @@ class BooksController extends Controller
             $Book->pages = $request->pages;
             $Book->user_id = Auth::user()->id;
 	        if ($Book->save()) {
-	        	$this->__sendMessage(['msg' => 'Book "' . $Book->name . '" Has been Created', 'usr' => Auth::user()->name]);
+                // Creating Notification Message
+                $message = 'Book "' . $Book->name . '" Has been Created';
+
+                // Sending Notification
+	        	$this->__sendMessage(['msg' => $message, 'usr' => Auth::user()->name]);
+
+                // Saving In Logs
+                Log::createLog([
+                    'action' => 'add_book',
+                    'msg' => $message,
+                    'user_id' => Auth::user()->id,
+                    'user_name' => Auth::user()->name,
+                ]);
+
+                // Redirect with success flash message
         		Session::flash('success', 'Book Saved Succesfully');
     			return redirect()->action('HomeController@index');
     		}else{
+                // Redirect with error flash message
     			return Redirect::back()
                 ->withErrors(['Something wrong happened while saving your model'])
                 ->withInput();
@@ -59,12 +75,27 @@ class BooksController extends Controller
 	        ]);
 
 			if (!$book->update(Input::all())) {
+                // Redirect with error flash message
         		return Redirect::back()
                 ->withErrors(['Something wrong happened while saving your model'])
                 ->withInput();
     		}
 
-    		$this->__sendMessage(['msg' => 'Book "' . $book->name . '" Has been Edited', 'usr' => Auth::user()->name]);
+            // Creating Notification Message
+            $message = 'Book "' . $book->name . '" Has been Edited';
+
+            // Sending Notification
+    		$this->__sendMessage(['msg' => $message,  'usr' => Auth::user()->name]);
+
+            // Saving In Logs
+            Log::createLog([
+                'action' => 'edit_book',
+                'msg' => $message,
+                'user_id' => Auth::user()->id,
+                'user_name' => Auth::user()->name,
+            ]);
+
+            // Redirect with success flash message
     		Session::flash('success', 'Book Succesfully Updated');
     		return redirect()->action('HomeController@index');
     	}
@@ -84,11 +115,26 @@ class BooksController extends Controller
 
 		// Redirect with errors, if incorrect id has passed
     	if(empty($book) || !$this->checkAuthor($book->user_id)){
+            // Redirect with error flash message
     		return Redirect::back()->withErrors(['Book Not Found']);
     	}
 
     	if($book->delete($id)){
-    		$this->__sendMessage(['msg' => 'Book "' . $book->name . '" Has been Deleted', 'usr' => Auth::user()->name]);
+            // Creating Notification Message
+            $message = 'Book "' . $book->name . '" Has been Deleted';
+
+            // Sending Notification
+    		$this->__sendMessage(['msg' => $message, 'usr' => Auth::user()->name]);
+
+            // Saving In Logs
+            Log::createLog([
+                'action' => 'delete_book',
+                'msg' => $message,
+                'user_id' => Auth::user()->id,
+                'user_name' => Auth::user()->name,
+            ]);
+
+            // Redirect with success flash message
     		Session::flash('success', 'Book Succesfully Deleted');
     		return redirect()->action('HomeController@index');
     	}

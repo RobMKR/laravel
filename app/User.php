@@ -29,11 +29,19 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the Author of Book.
+     * Setting One-To-Many Relationship with Book Model
      */
     public function books()
     {
         return $this->hasMany('App\Book');
+    }
+
+    /**
+     * Setting One-To-Many Relationship with Book Model
+     */
+    public function notification_logs()
+    {
+        return $this->hasMany('App\NotificationLog');
     }
 
 
