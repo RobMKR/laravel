@@ -58,7 +58,7 @@ class Controller extends BaseController
      */
     protected function __sendMessage($params){
         $redis = LRedis::connection();
-        $data = ['message' => $params['msg'], 'user' => $params['usr']];
+        $data = ['message' => $params['msg'], 'user' => $params['usr'], 'user_hashed' => sha1(Auth::user()->id)];
         $redis->publish('message', json_encode($data));
         return $data;
     }

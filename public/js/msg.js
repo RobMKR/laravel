@@ -6,9 +6,4 @@ $(document).ready(function(){
 			$('.alert').fadeOut(500)
 		}, 3000);
 	}
-
-	/* Toggle notification bar */
-	$('.notification-bar .panel-heading').click(function(){
-		$('.panel-body').toggle(300);
-	});
 });

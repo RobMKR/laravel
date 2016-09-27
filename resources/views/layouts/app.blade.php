@@ -135,14 +135,15 @@
     </div>
     <script>
         var socket = io.connect('http://localhost:8890');
+        var user_hashed = '{{sha1(Auth::user()->id)}}';
         /* Get Message From Socket Server */
         socket.on('message', function (data) {
             data = jQuery.parseJSON(data);
-            $( "#messages" ).append( "<strong>"+data.user+":</strong><p>"+data.message+"</p>" );
-            notifyMe({
-                user: data.user,
-                msg: data.message
-            });
+            if(data.user_hashed !== user_hashed){
+                $( "#messages" ).append( "<strong>"+data.user+":</strong><p>"+data.message+"</p>" );
+                notifyMe({user: data.user , msg: data.message});
+                Panel.open();
+            }
         });
 
         /* Send Messages To Socket Server */
@@ -169,7 +170,5 @@
     <!-- Scripts -->
     <script src="/js/app.js"></script>
     <script src="/js/msg.js"></script>
-        
-    </script>
 </body>
 </html>

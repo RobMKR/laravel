@@ -1,4 +1,30 @@
+var Panel = new function(){
+    this.open = function(time){
+        if(!$('.panel-body').is(':visible')){
+            $('.panel-body').show(time);
+        }
+    };
+
+    this.close = function(time){
+        if($('.panel-body').is(':visible')){
+            $('.panel-body').hide(time);
+        }
+    };
+
+    this.toggle = function(time){
+        $('.panel-body').toggle(time);
+    };
+}
+
 $(document).ready(function () {
+
+    window.name = 'test';
+
+    /* Toggle notification bar */
+    $('.notification-bar .panel-heading').click(function(){
+        Panel.toggle(300);
+    });
+
     if(Notification.permission === "denied"){
         alert('You have blocked Our Notifications. If You want to see them again, allow it from your browser settings.');
     }
@@ -20,6 +46,5 @@ function notifyMe(params) {
 	        icon: '/img/Laravel.png',
 	        body: "User " + params.user + " sends Notification. To see Notification click on The Notifications tab.",
 	    });
-        $(".panel-heading").click();
     }
 }

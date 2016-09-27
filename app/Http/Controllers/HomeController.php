@@ -34,7 +34,7 @@ class HomeController extends Controller
 
     public function sendMessage(Request $request){
         $redis = LRedis::connection();
-        $data = ['message' => $request->input('message'), 'user' => $request->input('user')];
+        $data = ['message' => $request->input('message'), 'user' => $request->input('user'), 'user_hashed' => sha1(Auth::user()->id)];
         $redis->publish('message', json_encode($data));
         return response()->json([]);
     }
