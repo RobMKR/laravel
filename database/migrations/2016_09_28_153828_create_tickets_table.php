@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateNotificationsLog extends Migration
+class CreateTicketsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,21 @@ class CreateNotificationsLog extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('notification_logs')) {
-            Schema::create('notification_logs', function (Blueprint $table) {
+        if (!Schema::hasTable('tickets')) {
+            Schema::create('tickets', function (Blueprint $table) {
                 $table->engine = 'InnoDB';
 
                 $table->increments('id');
+                $table->string('name', 255);
+                $table->text('description');
+                $table->unsignedInteger('department_id');
                 $table->unsignedInteger('user_id');
-                $table->string('user_name', 255);
-                $table->longText('message');
-                $table->string('message_type', 100);
+                $table->string('status', 255);
                 $table->timestamps();
 
+                $table->index('department_id');
                 $table->index('user_id');
+                $table->foreign('department_id')->references('id')->on('departments')->onDelete('cascade')->onUpdate('cascade');
                 $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             });
         }

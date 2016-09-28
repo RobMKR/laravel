@@ -9,7 +9,9 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Vinkla\Hashids\Facades\Hashids as Hashids;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\User as User;
 use LRedis;
+use Mail;
 
 class Controller extends BaseController
 {
@@ -17,9 +19,10 @@ class Controller extends BaseController
 
     
 	/**
-     * return Decoded Id
+     * decoder
      *
      * @param string
+     * @return  integer
      */
 	protected function decode($id){
 		$id = Hashids::decode($id);
@@ -31,35 +34,51 @@ class Controller extends BaseController
 	}
 
 	/**
-     * return Encoded Id
+     * encoder
      *
      * @param string
+     * @return integer
      */
 	protected function encode($id){
 		return Hashids::encode($id);
 	}
 
     /**
-     * return Encoded Id
+     * Getting Superadmin Object
      *
-     * @param int
+     * @return object
      */
-    protected function checkAuthor($user_id){
-        if($user_id === Auth::user()->id){
-            return true;
-        }
-        return false;
+	protected function superadmin(){
+        return User::where('role', 'superadmin')->first();
     }
 
     /**
      * Send Notification To All connected users
      *
-     * @param array message, user
+     * @param array
+     * @return json
      */
-    protected function __sendMessage($params){
+    protected function __sendIndividualMessage($params){
         $redis = LRedis::connection();
-        $data = ['message' => $params['msg'], 'user' => $params['usr'], 'user_hashed' => sha1(Auth::user()->id)];
+        $data = ['message' => $params['msg'], 'to' => $params['to']];
         $redis->publish('message', json_encode($data));
         return $data;
+    }
+
+    /**
+     * Simple Mailer component
+     *
+     * @param string
+     * @param string
+     * @param email
+     * @return json
+     */
+    protected function send($title, $content, $to){
+        Mail::send('email.blank', ['title' => $title, 'content' => $content], function ($message) use ($to)
+        {
+            $message->from('me@gmail.com', 'Christian Nwamba');
+            $message->to($to);
+        });
+        return response()->json(['message' => 'Request completed']);
     }
 }

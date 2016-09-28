@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Input;
 use App\User as User;
+use App\Department as Department;
+use App\NotificationLog as Log;
 use App\Http\Requests;
 use Validator;
 use Session;
@@ -87,7 +89,162 @@ class AdminController extends Controller
     	}
     }
 
-    public function superFeatures(){
-    	return view('admin/super_features');
+    /**
+     * Departments Page
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function departments(){
+        $viewData['departments'] = Department::All();
+    	return view('admin/departments')->with('data', $viewData);
+    }
+
+    /**
+     * Add Department Page
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function addDepartment(Request $request){
+        $owners = User::whereIn('role', ['admin', 'author'])->pluck('name', 'id');
+        // Post Data
+        if($request->isMethod('post')){
+            // Validating Data
+            $this->validate($request, [
+                'name' => 'required|max:255|unique:departments,name',
+                'owner' => 'required|integer|exists:users,id|unique:departments,owner_id',
+            ]);
+            // Saving Data
+            $Department = new Department();
+            $Department->name = $request->name;
+            $Department->owner_id = $request->owner;
+            if ($Department->save()) {
+                // Creating Notification Message
+                $message = 'Department "' . $Department->name . '" created. And You are owner of it.';
+
+                // Sending Notification
+                $this->__sendIndividualMessage(['msg' => $message, 'to' => hash_hmac('SHA1', $Department->owner_id, 'A2888mTnk874MB')]);
+
+                // Saving In Logs
+                Log::createLog([
+                    'action' => 'add_department',
+                    'msg' => $message,
+                    'user_id' => Auth::user()->id,
+                    'user_name' => Auth::user()->name,
+                ]);
+
+                // Redirect with success flash message
+                Session::flash('success', 'Department Saved Succesfully');
+                return redirect()->action('AdminController@departments');
+            }else{
+                // Redirect with error flash message
+                return Redirect::back()
+                    ->withErrors(['Something wrong happened while saving your model'])
+                    ->withInput();
+            }
+        }
+
+        // Getting Id->Name Pair from DB >>>
+        $viewData['owners'] = $owners;
+        return view('admin/add_department')->with('data', $viewData);
+    }
+
+    /**
+     * Edit Department Page
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function editDepartment(Request $request, $id){
+        // Decoding Id
+        $id = $this->decode($id);
+
+        // Getting User
+        $department = Department::find($id);
+
+        // Redirect with errors, if incorrect id has passed
+        if(empty($department)){
+            return Redirect::back()->withErrors(['Department Not Found']);
+        }
+
+        // Post Data
+        if($request->isMethod('post')){
+            // Validating Data
+            $this->validate($request, [
+                'name' => 'required|max:255|unique:departments,name,'.$id,
+                'owner_id' => 'required|integer|exists:users,id|unique:departments,owner_id,'.$id,
+            ]);
+
+            // Saving Data
+            if (!$department->update(Input::all())) {
+                // Redirect with error flash message
+                return Redirect::back()
+                    ->withErrors(['Something wrong happened while saving your model'])
+                    ->withInput();
+            }
+
+            // Creating Notification Message
+            $message = 'Department "' . $department->name . '" Has been Updated.';
+
+            // Sending Notification
+            $this->__sendIndividualMessage(['msg' => $message, 'to' => hash_hmac('SHA1', $department->owner_id, 'A2888mTnk874MB')]);
+
+            // Saving In Logs
+            Log::createLog([
+                'action' => 'update_department',
+                'msg' => $message,
+                'user_id' => Auth::user()->id,
+                'user_name' => Auth::user()->name,
+            ]);
+
+            // Redirect with success flash message
+            Session::flash('success', 'Department Successfully Updated');
+            return redirect()->action('AdminController@departments');
+        }
+
+        // Getting All Admin permission Users
+        $viewData['owners'] = User::whereIn('role', ['admin', 'author'])->pluck('name', 'id');
+
+        // Creating View Data
+        $viewData['department'] = $department;
+        return view('admin/edit_department')->with('data', $viewData);
+    }
+
+    /**
+     * Delete Department
+     *
+     * @return redirect to Departments
+     */
+    public function deleteDepartment($id){
+        // Decoding Id
+        $id = $this->decode($id);
+
+        // Getting Book
+        $department = Department::find($id);
+
+        // Redirect with errors, if incorrect id has passed
+        if(empty($department)){
+            // Redirect with error flash message
+            return Redirect::back()->withErrors(['Book Not Found']);
+        }
+
+        // Delete Department
+        if($department->delete($id)){
+            // Creating Notification Message
+            $message = 'Department "' . $department->name . '" Has been Deleted';
+
+            // Sending Notification
+            $this->__sendIndividualMessage(['msg' => $message, 'to' => hash_hmac('SHA1', $department->owner_id, 'A2888mTnk874MB')]);
+
+            // Saving In Logs
+            Log::createLog([
+                'action' => 'delete_department',
+                'msg' => $message,
+                'user_id' => Auth::user()->id,
+                'user_name' => Auth::user()->name,
+            ]);
+
+            // Redirect with success flash message
+            Session::flash('success', 'Department Succesfully Deleted');
+            return redirect()->action('AdminController@departments');
+        }
     }
 }

@@ -61,7 +61,7 @@
                         <li><a href="{{ url('/login') }}">Login</a></li>
                         <li><a href="{{ url('/register') }}">Register</a></li>
                     @else
-                        @if (Auth::user()->getLevel() > 1)
+                        @if (Auth::user()->getLevel() === 3)
                             <li>
                                 <a href="{{url('/admin')}}" role="button">Admin Panel</a>
                             </li>
@@ -69,9 +69,12 @@
                         <li>
                             <a href="{{url('/home')}}" role="button">Home</a>
                         </li>
-                        @if(Auth::user()->getLevel())
+                        <li>
+                            <a href="{{url('/departments')}}" role="button">Departments</a>
+                        </li>
+                        @if (Auth::user()->getLevel() === 0 || Auth::user()->getLevel() === 3)
                             <li>
-                                <a href="{{url('/books/addBook')}}" role="button">Add Book</a>
+                                <a href="{{url('/tickets')}}" role="button">Tickets</a>
                             </li>
                         @endif
 
@@ -134,13 +137,15 @@
         </div>
     </div>
     <script>
-        var socket = io.connect('http://localhost:8890');
         var user_hashed = '{{sha1(Auth::user()->id)}}';
+        var socket = io.connect('http://localhost:8890', {
+            query: '{{hash_hmac('SHA1', 'user', 'A2888mTnk874MB')}}={{hash_hmac('SHA1', Auth::user()->id, 'A2888mTnk874MB')}}&{{hash_hmac('SHA1', 'role', 'A2888mTnk874MB')}}={{hash_hmac('SHA1', Auth::user()->role, 'A2888mTnk874MB')}}'
+        });
         /* Get Message From Socket Server */
         socket.on('message', function (data) {
             data = jQuery.parseJSON(data);
             if(data.user_hashed !== user_hashed){
-                $( "#messages" ).append( "<strong>"+data.user+":</strong><p>"+data.message+"</p>" );
+                $( "#messages" ).append( "<strong>"+data.from+":</strong><p>"+data.message+"</p>" );
                 notifyMe({user: data.user , msg: data.message});
                 Panel.open();
             }

@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Book as Book;
+use App\Department as Department;
+use App\Ticket as Ticket;
 use LRedis;
 
 class HomeController extends Controller
@@ -23,19 +24,39 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(){   
-        $viewData =  Book::separeteBooks(Book::all(), Auth::user()->id);
-        return view('home')->with('data', $viewData);
+    public function index(){
+        return view('home');
     }
-
-    public function chat(){   
-        return view('chat');
-    }
-
+    /**
+     * SuperAdmin SendMessage Action (via WS)
+     *
+     * @return json
+     */
     public function sendMessage(Request $request){
+        $user_id = hash_hmac('SHA1', '4', 'A2888mTnk874MB');
         $redis = LRedis::connection();
-        $data = ['message' => $request->input('message'), 'user' => $request->input('user'), 'user_hashed' => sha1(Auth::user()->id)];
+        $data = ['message' => $request->input('message'), 'user' => $request->input('user'), 'user_hashed' => sha1(Auth::user()->id), 'to' => $user_id];
         $redis->publish('message', json_encode($data));
         return response()->json([]);
+    }
+
+    /**
+     * Departments Page
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function departments(){
+        $viewData['departments'] = Department::All();
+        return view('departments')->with('data', $viewData);
+    }
+
+    /**
+     * Tickets Page
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function tickets(){
+        $viewData['tickets'] = Ticket::All();
+        return view('tickets')->with('data', $viewData);
     }
 }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateBooksTable extends Migration
+class CreateDepartmentsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,18 +13,17 @@ class CreateBooksTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('books')) {
-            Schema::create('books', function (Blueprint $table) {
+        if (!Schema::hasTable('departments')) {
+            Schema::create('departments', function (Blueprint $table) {
                 $table->engine = 'InnoDB';
 
                 $table->increments('id');
+                $table->unsignedInteger('owner_id');
                 $table->string('name', 255);
-                $table->integer('pages');
-                $table->integer('user_id');
                 $table->timestamps();
 
-                $table->index('user_id');
-                $table->foreign('user_id')->references('id')->on('users');
+                $table->index('owner_id');
+                $table->foreign('owner_id')->references('id')->on('users')->onDelete('CASCADE')->onUpdate('CASCADE');
             });
         }
     }

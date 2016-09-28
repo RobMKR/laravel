@@ -29,11 +29,11 @@ class User extends Authenticatable
     ];
 
     /**
-     * Setting One-To-Many Relationship with Book Model
+     * Setting One-To-One Relationship with Departments Model
      */
-    public function books()
+    public function department()
     {
-        return $this->hasMany('App\Book');
+        return $this->hasOne('App\Book');
     }
 
     /**
@@ -42,6 +42,14 @@ class User extends Authenticatable
     public function notification_logs()
     {
         return $this->hasMany('App\NotificationLog');
+    }
+
+    /**
+     * Setting One-To-Many Relationship with Tickets Model
+     */
+    public function tickets()
+    {
+        return $this->hasMany('App\Ticket');
     }
 
 

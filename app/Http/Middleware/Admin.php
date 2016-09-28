@@ -15,7 +15,7 @@ class Admin
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::check() && Auth::user()->getLevel() > 1){
+        if (Auth::check() && Auth::user()->getLevel() === 3){
             return $next($request);
         }
 

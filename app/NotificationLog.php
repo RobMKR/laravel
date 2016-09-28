@@ -19,6 +19,7 @@ class NotificationLog extends Model
      * Saving Log 
      *
      * @param array
+     * @return boolean
      */
     public static function createLog($params){
     	if(empty($params)){
@@ -29,20 +30,7 @@ class NotificationLog extends Model
 		$Log->user_id = $params['user_id'];
 		$Log->user_name = $params['user_name'];
 		$Log->message = $params['msg'];
-
-    	switch($params['action']){
-    		case 'add_book':
-    			$Log->message_type = 'add_book';
-    			break;
-			case 'edit_book':;
-    			$Log->message_type = 'edit_book';
-				break;
-			case 'delete_book':
-				$Log->message_type = 'delete_book';
-				break;
-			default:
-				$Log->message_type = 'other';
-    	}
+        $Log->message_type = $params['action'];
 
     	if($Log->save()){
     		return true;

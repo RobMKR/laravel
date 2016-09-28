@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Closure;
 
-class Book
+class Ticket
 {
     /**
      * Handle an incoming request.
@@ -15,10 +15,12 @@ class Book
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::check() && Auth::user()->getLevel() > 0){
+        $level = Auth::user()->getLevel();
+        // Only users and SuperAdmin
+        if ($level === 0 || $level === 3){
             return $next($request);
         }
-
+        dd($level);
         return redirect('home');
     }
 }
