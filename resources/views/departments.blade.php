@@ -13,6 +13,7 @@
                             <li class="departmentInfo list-group-item text-center">
                                 <span>
                                     <strong>Name: </strong>{{$_department->name}}
+                                    <strong>Admin: </strong>{{$_department->owner->name}}
                                 </span>
                             </li>
                         @endforeach

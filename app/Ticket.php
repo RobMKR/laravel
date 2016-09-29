@@ -43,4 +43,18 @@ class Ticket extends Model
     protected $fillable = [
         'name','description', 'department_id', 'user_id', 'status'
     ];
+
+    /**
+     * Get array of tickets sorted by status
+     *
+     * @param object
+     * @return array
+     */
+    public function groupByStatus($tickets){
+        $return = [];
+        foreach($tickets as $_ticket){
+            $return[$_ticket->status][] = $_ticket;
+        }
+        return $return;
+    }
 }

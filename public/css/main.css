@@ -32,3 +32,6 @@ li.departmentInfo a.glyphicon {
     overflow: auto;
     padding: 5px;
 }
+.fr {
+    float:right;
+}

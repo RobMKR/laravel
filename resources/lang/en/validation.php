@@ -112,6 +112,9 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'old_password' => 'Old Password'
+    ],
+    'old_password' => ':attribute Don\'t match',
 
 ];

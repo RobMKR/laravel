@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use App\Book as Book;
+use App\Department as Department;
 
 class User extends Authenticatable
 {
@@ -29,11 +29,19 @@ class User extends Authenticatable
     ];
 
     /**
-     * Setting One-To-One Relationship with Departments Model
+     * Setting One-To-One Relationship with Departments Model (department admin)
      */
     public function department()
     {
-        return $this->hasOne('App\Book');
+        return $this->hasOne('App\Department', 'owner_id');
+    }
+
+    /**
+     * Setting One-To-Many Relationship with Departments Model (department staff)
+     */
+    public function in_department()
+    {
+        return $this->belongsTo('App\Department', 'id');
     }
 
     /**
@@ -65,7 +73,7 @@ class User extends Authenticatable
                 return 3;
             case 'admin':
                 return 2;
-            case 'author': 
+            case 'staff':
                 return 1;
             default :
                 return 0;

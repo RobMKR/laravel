@@ -16,10 +16,18 @@ class Department extends Model
     ];
 
     /**
-     * Setting One-To-Many Relationship with User Model on Owner Column
+     * Setting One-To-Many Relationship with User Model on departments.owner_id column
      */
     public function owner()
     {
         return $this->belongsTo('App\User');
+    }
+
+    /**
+     * Setting One-To-Many Relationship with User Model on users.in_department column
+     */
+    public function staff()
+    {
+        return $this->hasMany('App\User');
     }
 }

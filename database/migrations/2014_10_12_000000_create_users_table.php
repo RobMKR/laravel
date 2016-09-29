@@ -20,8 +20,12 @@ class CreateUsersTable extends Migration
                 $table->string('email')->unique();
                 $table->string('password');
                 $table->string('role', 100)->default('user');
+                $table->unsignedInteger('in_department')->nullable();
                 $table->rememberToken();
                 $table->timestamps();
+
+                $table->index('in_department');
+                $table->foreign('in_department')->references('id')->on('departments')->onDelete('SET NULL')->onUpdate('SET NULL');
             });
         }
     }

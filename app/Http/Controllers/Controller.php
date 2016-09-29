@@ -53,7 +53,7 @@ class Controller extends BaseController
     }
 
     /**
-     * Send Notification To All connected users
+     * Send Notification To Individual User
      *
      * @param array
      * @return json
@@ -68,6 +68,11 @@ class Controller extends BaseController
     /**
      * Simple Mailer component
      *
+     * Note * We are using Mail::send method, which takes about 3-5 seconds waited for mail response
+     * Note * To Decrease duration of mails, use Mail::queue instead of Mail::send
+     * Note * Queus not supported in Windows (because you must install "pcntl" ext. for PHP that is not supported on Windows)
+     * Note * So, in Local Machine we used Mail::send, don't forget to change it to queue when place app on unix based server
+     *
      * @param string
      * @param string
      * @param email
@@ -80,5 +85,18 @@ class Controller extends BaseController
             $message->to($to);
         });
         return response()->json(['message' => 'Request completed']);
+    }
+
+    /**
+     * Return true when ticket owner or super admin is logged in
+     *
+     * @param ticket
+     * @return boolean
+     */
+    protected function checkOwner($ticket){
+        if($ticket->user_id === Auth::user()->id || Auth::user()->getLevel() === 3){
+            return true;
+        }
+        return false;
     }
 }

@@ -25,7 +25,7 @@
     </script>
 </head>
 <body>
-    <nav class="navbar navbar-default navbar-static-top">
+    <nav class="navbar navbar-default navbar-static-top nav-admin">
         <div class="container">
             <div class="navbar-header">
 
@@ -39,7 +39,7 @@
 
                 <!-- Branding Image -->
                 <a class="navbar-brand" href="{{ url('/admin') }}">
-                    {{ config('app.name', 'Laravel Admin Panel') }}
+                    Admin Panel
                 </a>
             </div>
 
@@ -54,13 +54,16 @@
 
                 <!-- Right Side Of Navbar -->
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a href="{{url('/home')}}" role="button">Home</a></li>
+                    <li><a href="{{url('/admin/tickets')}}" role="button">Manage Tickets</a></li>
                     <li><a href="{{url('/admin/departments')}}" role="button">Manage Departments</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                             {{ Auth::user()->name }} <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
+                            <li><a href="{{ url('/home') }}">Switch to Site</a></li>
+                            <li><a href="{{ url('/admin/editAccount') }}">Edit Account</a></li>
+                            <li class="divider"></li>
                             <li>
                                 <a href="{{ url('/logout') }}"
                                     onclick="event.preventDefault();

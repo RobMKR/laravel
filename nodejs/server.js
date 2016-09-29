@@ -20,17 +20,13 @@ io.on('connection', function (socket) {
 		socket_id : socket.client.conn.id , 
 		role : socket.handshake.query[role_hash]
 	};
-    var redisClient = redis.createClient();
 	
+    var redisClient = redis.createClient();
     redisClient.subscribe('message');
   
     redisClient.on("message", function(channel, data) {
 		var params = JSON.parse(data);
-		console.log(params.to);
-		console.log(users);
-		console.log("mew message add in queue channel");
-		console.log(typeof users[params.to]);
-		if(typeof users[params.to] !== 'undefined'){
+		if(socket.handshake.query[user_hash] === params.to){
 			socket.emit(channel, data);
 		}
     });

@@ -4,20 +4,19 @@ namespace App\Http\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Closure;
 
-class Ticket
+class Department
 {
     /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @return mixed
+     * @return redirect
      */
     public function handle($request, Closure $next)
     {
-        $level = Auth::user()->getLevel();
-        // Only users and SuperAdmin
-        if ($level === 0 || $level === 3){
+        // Only Admins
+        if (Auth::user()->getLevel() === 2){
             return $next($request);
         }
         return redirect('home');

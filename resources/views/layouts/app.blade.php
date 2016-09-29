@@ -40,8 +40,8 @@
                 </button>
 
                 <!-- Branding Image -->
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
+                <a class="navbar-brand" href="{{ url('/home') }}">
+                    App Dashboard
                 </a>
             </div>
 
@@ -61,14 +61,16 @@
                         <li><a href="{{ url('/login') }}">Login</a></li>
                         <li><a href="{{ url('/register') }}">Register</a></li>
                     @else
-                        @if (Auth::user()->getLevel() === 3)
-                            <li>
-                                <a href="{{url('/admin')}}" role="button">Admin Panel</a>
+                        @if (Auth::user()->getLevel() === 2 && Auth::user()->department->id)
+                             <li class="dropdown">
+                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">My Department<span class="caret"></span></a>
+                                 <ul class="dropdown-menu">
+                                     <li><a href="{{url('/departments/manage')}}">Manage</a></li>
+                                     <li><a href="{{url('/departments/tickets')}}">Tickets</a></li>
+                                     <li><a href="{{url('/departments/staff')}}">Staff</a></li>
+                                 </ul>
                             </li>
                         @endif
-                        <li>
-                            <a href="{{url('/home')}}" role="button">Home</a>
-                        </li>
                         <li>
                             <a href="{{url('/departments')}}" role="button">Departments</a>
                         </li>
@@ -84,6 +86,12 @@
                             </a>
 
                             <ul class="dropdown-menu" role="menu">
+                                @if (Auth::user()->getLevel() === 3)
+                                    <li>
+                                        <a href="{{url('/admin')}}">Switch to Admin Panel</a>
+                                    </li>
+                                    <li class="divider"></li>
+                                @endif
                                 <li>
                                     <a href="{{ url('/logout') }}"
                                         onclick="event.preventDefault();
