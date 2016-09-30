@@ -180,7 +180,7 @@ class AdminController extends Controller
                 $message = 'Department "' . $Department->name . '" created. And You are owner of it.';
 
                 // Sending Notification
-                $this->__sendIndividualMessage(['msg' => $message, 'to' => hash_hmac('SHA1', $Department->owner_id, 'A2888mTnk874MB')]);
+                $this->__sendIndividualMessage(['msg' => $message, 'type' => 'toUser', 'to' => hash_hmac('SHA1', $Department->owner_id, 'A2888mTnk874MB')]);
 
                 // Saving In Logs
                 Log::createLog([
@@ -243,7 +243,7 @@ class AdminController extends Controller
             $message = 'Department "' . $department->name . '" Has been Updated.';
 
             // Sending Notification
-            $this->__sendIndividualMessage(['msg' => $message, 'to' => hash_hmac('SHA1', $department->owner_id, 'A2888mTnk874MB')]);
+            $this->__sendIndividualMessage(['msg' => $message,'type' => 'toUser', 'to' => hash_hmac('SHA1', $department->owner_id, 'A2888mTnk874MB')]);
 
             // Saving In Logs
             Log::createLog([
@@ -290,7 +290,7 @@ class AdminController extends Controller
             $message = 'Department "' . $department->name . '" Has been Deleted';
 
             // Sending Notification
-            $this->__sendIndividualMessage(['msg' => $message, 'to' => hash_hmac('SHA1', $department->owner_id, 'A2888mTnk874MB')]);
+            $this->__sendIndividualMessage(['msg' => $message,'type' => 'toUser', 'to' => hash_hmac('SHA1', $department->owner_id, 'A2888mTnk874MB')]);
 
             // Saving In Logs
             Log::createLog([
@@ -319,5 +319,48 @@ class AdminController extends Controller
 
         return view('admin/tickets')->with('data', $viewData);
 
+    }
+
+    /**
+     * Accept User Ticket
+     *
+     * @param ticket $id
+     * @return redirect
+     */
+    public function acceptTicket($id){
+        // Decoding $id
+        $id = $this->decode($id);
+
+        // Getting Ticket
+        $ticket = Ticket::find($id);
+
+        // Redirect with errors, if incorrect id has passed
+        if(empty($ticket)){
+            // Redirect with error flash message
+            return Redirect::back()->withErrors(['Ticket Not Found']);
+        }
+
+        // Update Ticket
+        if($ticket->update(['status' => 'accepted'])){
+            // Creating Notification Message
+            $message = 'Ticket "' . $ticket->name . '" Accepted';
+
+            // Sending Notification
+            $this->__sendIndividualMessage(['msg' => $message,'type' => 'toUser', 'to' => hash_hmac('SHA1', $ticket->department->owner->id, 'A2888mTnk874MB')]);
+
+            // Saving In Logs
+            Log::createLog([
+                'action' => 'ticket_accepted',
+                'msg' => $message,
+                'user_id' => Auth::user()->id,
+                'user_name' => Auth::user()->name,
+            ]);
+
+            // Redirect with success flash message
+            Session::flash('success', 'Ticket Successfully Updated');
+            return redirect()->action('AdminController@tickets');
+        }
+
+        return Redirect::back()->withErrors(['Something Goes Wrong']);
     }
 }

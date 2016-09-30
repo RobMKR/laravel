@@ -60,7 +60,7 @@ class Controller extends BaseController
      */
     protected function __sendIndividualMessage($params){
         $redis = LRedis::connection();
-        $data = ['message' => $params['msg'], 'to' => $params['to']];
+        $data = ['message' => $params['msg'],'type' => $params['type'], 'to' => $params['to']];
         $redis->publish('message', json_encode($data));
         return $data;
     }

@@ -26,8 +26,20 @@ io.on('connection', function (socket) {
   
     redisClient.on("message", function(channel, data) {
 		var params = JSON.parse(data);
-		if(socket.handshake.query[user_hash] === params.to){
-			socket.emit(channel, data);
+		switch(params.type){
+			case 'toAdmin':
+				if(socket.handshake.query[user_hash] === params.to && users[socket.handshake.query[user_hash]]['role'] === admin_hash){
+					socket.emit(channel, data);
+				}
+				break;
+			case 'toUser':
+				if(socket.handshake.query[user_hash] === params.to){
+					socket.emit(channel, data);
+				}
+				break;
+			case 'fromAdmin':
+				socket.emit(channel, data);
+				break;
 		}
     });
  

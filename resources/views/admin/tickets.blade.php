@@ -19,7 +19,7 @@
                                     <strong>Department: </strong>{{$_ticket->department->name}} |
                                     <strong>Added By: </strong>{{$_ticket->user->name}}
                                 </span>
-                                <a href="{{url('/admin/tickets/manage/' . Hashids::encode($_ticket->id))}}" class="fr"> Manage </a>
+                                <a href="{{url('/admin/tickets/accept/' . Hashids::encode($_ticket->id))}}" class="fr"> Accept </a>
                             </li>
                         @endforeach
                         <li class="list-group-item">{{$data['tickets']->links()}}</li>

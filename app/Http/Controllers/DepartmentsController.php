@@ -48,9 +48,11 @@ class DepartmentsController extends Controller
         $viewData['department'] = $department;
 
         // Getting Tickets groupped by status
-        $Ticket = new Ticket();
-        $tickets = $Ticket->where('department_id', $department->id)->get();
-        $viewData['tickets'] = $Ticket->groupByStatus($tickets);
+        $tickets = Ticket::where(['department_id' => $department->id, 'status' => 'accepted'])->get();
+        $viewData['tickets'] = $tickets;
+
+        // Getting Department Staff
+        $viewData['staff'] = User::where('in_department', $department->id)->pluck('name', 'id');
 
         return view('departments/tickets')->with('data', $viewData);
     }
@@ -63,5 +65,22 @@ class DepartmentsController extends Controller
     public function staff(){
         $viewData['staff'] = User::where(['role' => 'admin'], ['in_department' => Auth::user()->department->id])->get();
         return view('departments/staff')->with('data', $viewData);
+    }
+
+    /**
+     * AJAX REQUEST
+     * Assign Ticket To User
+     *
+     * @param Request $request
+     * @return JSON
+     */
+    public function assignTicketToStaff(Request $request){
+        $ticket = Ticket::find($request->input('ticket'));
+        if($ticket->update(['responsible_id' => $request->input('user'), 'status' => 'ongoing'])){
+            $status = 'ok';
+        }else{
+            $status = 'error';
+        }
+        return response()->json(['status' => $status]);
     }
 }

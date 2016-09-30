@@ -45,7 +45,7 @@ class TicketsController extends Controller
                 $message = 'User "' . $Ticket->user->name . '" created a Ticket: "' . $Ticket->name . '" into Department: "' . $Ticket->department->name . '"';
 
                 // Sending Notification
-                $this->__sendIndividualMessage(['msg' => $message, 'to' => hash_hmac('SHA1', $this->superAdmin()->id, 'A2888mTnk874MB'), 'from' => 'System']);
+                $this->__sendIndividualMessage(['msg' => $message,'type' => 'toAdmin', 'to' => hash_hmac('SHA1', $this->superAdmin()->id, 'A2888mTnk874MB'), 'from' => 'System']);
 
                 // Saving In Logs
                 Log::createLog([
@@ -118,7 +118,7 @@ class TicketsController extends Controller
             $message = 'Ticket "' . $ticket->name . '" Has been Updated.';
 
             // Sending Notification
-            $this->__sendIndividualMessage(['msg' => $message, 'to' => hash_hmac('SHA1', $ticket->department->owner_id, 'A2888mTnk874MB')]);
+            $this->__sendIndividualMessage(['msg' => $message,'type' => 'toAdmin', 'to' => hash_hmac('SHA1', $ticket->department->owner_id, 'A2888mTnk874MB')]);
 
             // Saving In Logs
             Log::createLog([
@@ -164,7 +164,7 @@ class TicketsController extends Controller
             $message = 'Ticket "' . $ticket->name . '" Has been Deleted';
 
             // Sending Notification
-            $this->__sendIndividualMessage(['msg' => $message, 'to' => hash_hmac('SHA1', $ticket->department->owner_id, 'A2888mTnk874MB')]);
+            $this->__sendIndividualMessage(['msg' => $message,'type' => 'toAdmin', 'to' => hash_hmac('SHA1', $ticket->department->owner_id, 'A2888mTnk874MB')]);
 
             // Saving In Logs
             Log::createLog([

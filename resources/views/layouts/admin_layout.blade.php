@@ -17,6 +17,9 @@
 
     <!-- Scripts -->
     <script src="/js/jquery_2.min.js"></script>
+    <script src="/js/notification.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
 
     <script>
         window.Laravel = <?php echo json_encode([
@@ -97,8 +100,61 @@
     @endif
 
     @yield('content')
+    <div class="notification-bar">
+        <div class="panel panel-default">
+            <div class="panel-heading">Notification Bar</div>
+            <div class="panel-body">
+                <div id="messages"></div>
+                <div>
+                    <form action="sendmessage" method="POST">
+                        <input type="hidden" name="_token" value="I0PazTS85uo5WEZDKyqiBjtrrfWLcg1Hi8MaTxo0">
+                        <input type="hidden" name="user" value="admin">
+                        <textarea class="form-control msg"></textarea>
+                        <br>
+                        <input type="button" value="Send" class="btn btn-success send-msg">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Scripts -->
+    <script>
+        var user_hashed = '{{sha1(Auth::user()->id)}}';
+        var socket = io.connect('http://localhost:8890', {
+            query: '{{hash_hmac('SHA1', 'user', 'A2888mTnk874MB')}}={{hash_hmac('SHA1', Auth::user()->id, 'A2888mTnk874MB')}}&{{hash_hmac('SHA1', 'role', 'A2888mTnk874MB')}}={{hash_hmac('SHA1', Auth::user()->role, 'A2888mTnk874MB')}}'
+        });
+        /* Get Message From Socket Server */
+        socket.on('message', function (data) {
+            data = jQuery.parseJSON(data);
+            if(data.user_hashed !== user_hashed){
+                $( "#messages" ).append( "<strong>System:</strong><p>"+data.message+"</p>" );
+                notifyMe({user: data.user , msg: data.message});
+                Panel.open();
+            }
+        });
+
+        /* Send Messages To Socket Server */
+        $(".send-msg").click(function(e){
+            e.preventDefault();
+            var token = $("input[name='_token']").val();
+            var user = $("input[name='user']").val();
+            var msg = $(".msg").val();
+            if(msg != ''){
+                $.ajax({
+                    type: "POST",
+                    url: '{!! URL::to("/sendmessage") !!}',
+                    dataType: "json",
+                    data: {'_token':token,'message':msg,'user':user},
+                    success:function(data){
+                        $(".msg").val('');
+                    }
+                });
+            }else{
+                alert("Please Add Message.");
+            }
+        })
+    </script>
     <script src="/js/app.js"></script>
     <script src="/js/msg.js"></script>
 </body>

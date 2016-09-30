@@ -28,6 +28,14 @@ class Ticket extends Model
     }
 
     /**
+     * Setting One-To-Many Relationship with User Model (column responsible_id)
+     */
+    public function responsible()
+    {
+        return $this->belongsTo('App\User', 'responsible_id', 'id');
+    }
+
+    /**
      * Setting One-To-Many Relationship with Department Model
      */
     public function department()
@@ -41,7 +49,7 @@ class Ticket extends Model
      * @var array
      */
     protected $fillable = [
-        'name','description', 'department_id', 'user_id', 'status'
+        'name','description', 'department_id', 'user_id', 'status', 'responsible_id'
     ];
 
     /**

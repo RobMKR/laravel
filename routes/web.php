@@ -41,7 +41,7 @@ Route::group(['middleware' => ['admin']], function () {
 
     /* Tickets */
     Route::get('/admin/tickets', 'AdminController@tickets');
-    Route::get('/admin/tickets/manage/{id}', 'AdminController@manageTicket');
+    Route::get('/admin/tickets/accept/{id}', 'AdminController@acceptTicket');
 });
 
 // Add/Edit User Tickets
@@ -58,6 +58,7 @@ Route::group(['middleware' => ['ticket']], function () {
 Route::group(['middleware' => ['department']], function () {
     Route::get('/departments/manage', 'DepartmentsController@manage');
     Route::get('/departments/tickets', 'DepartmentsController@tickets');
+    Route::get('/departments/tickets/assign/{id}', 'DepartmentsController@assignTicket');
     Route::get('/departments/staff', 'DepartmentsController@staff');
 });
 
@@ -66,3 +67,7 @@ Route::get('/home', 'HomeController@index');
 Route::get('/tickets', 'HomeController@tickets');
 Route::get('/departments', 'HomeController@departments');
 Route::post('sendmessage', 'HomeController@sendMessage');
+
+/* Ajax Requests */
+
+Route::post('/departments/tickets/assign', 'DepartmentsController@assignTicketToStaff');

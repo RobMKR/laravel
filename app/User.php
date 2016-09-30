@@ -53,11 +53,19 @@ class User extends Authenticatable
     }
 
     /**
-     * Setting One-To-Many Relationship with Tickets Model
+     * Setting One-To-Many Relationship with Tickets Model where column is owner of ticket
      */
-    public function tickets()
+    public function ticketsOwner()
     {
-        return $this->hasMany('App\Ticket');
+        return $this->hasMany('App\Ticket', 'user_id');
+    }
+
+    /**
+     * Setting One-To-Many Relationship with Tickets Model where column is responsible of ticket
+     */
+    public function ticketsResponsible()
+    {
+        return $this->hasMany('App\Ticket', 'responsible_id');
     }
 
 
@@ -88,7 +96,7 @@ class User extends Authenticatable
     public static function getRoles($role){
         $roles = [
             'user' => 'User',
-            'author' => 'Author'
+            'staff' => 'Staff'
         ];
         switch($role){
             case 'superadmin':
@@ -98,5 +106,16 @@ class User extends Authenticatable
                 break;
         }
         return $roles;
+    }
+
+    /**
+     * Getting All Users of department
+     *
+     * @param int $department_id
+     * @return array $users
+     */
+    public function getDepartmentStaff($department_id){
+        $users = $this->where('in_department', $department_id)->pluck('name', 'id');
+        return $users;
     }
 }

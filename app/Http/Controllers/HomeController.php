@@ -30,12 +30,12 @@ class HomeController extends Controller
     /**
      * SuperAdmin SendMessage Action (via WS)
      *
+     * @param $request
      * @return json
      */
     public function sendMessage(Request $request){
-        $user_id = hash_hmac('SHA1', '4', 'A2888mTnk874MB');
         $redis = LRedis::connection();
-        $data = ['message' => $request->input('message'), 'user' => $request->input('user'), 'user_hashed' => sha1(Auth::user()->id), 'to' => $user_id];
+        $data = ['message' => $request->input('message'), 'type' => 'fromAdmin', 'user' => $request->input('user'), 'user_hashed' => sha1(Auth::user()->id)];
         $redis->publish('message', json_encode($data));
         return response()->json([]);
     }

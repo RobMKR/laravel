@@ -23,10 +23,13 @@ class CreateTicketsTable extends Migration
                 $table->unsignedInteger('department_id');
                 $table->unsignedInteger('user_id');
                 $table->string('status', 255);
+                $table->unsignedInteger('responsible_id')->nullable();
                 $table->timestamps();
 
                 $table->index('department_id');
                 $table->index('user_id');
+                $table->index('responsible_id');
+                $table->foreign('responsible_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
                 $table->foreign('department_id')->references('id')->on('departments')->onDelete('cascade')->onUpdate('cascade');
                 $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
             });

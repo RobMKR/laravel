@@ -113,8 +113,8 @@ return [
     */
 
     'attributes' => [
-        'old_password' => 'Old Password'
+        'old_password' => 'Old Password',
     ],
-    'old_password' => ':attribute Don\'t match',
+    'user_in_department' => 'User is not exists, or he is not in current department staff.',
 
 ];
