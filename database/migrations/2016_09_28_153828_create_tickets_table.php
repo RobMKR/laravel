@@ -22,7 +22,7 @@ class CreateTicketsTable extends Migration
                 $table->text('description');
                 $table->unsignedInteger('department_id');
                 $table->unsignedInteger('user_id');
-                $table->string('status', 255);
+                $table->enum('status', ['pending', 'accepted', 'ongoing', 'completed'])->default('pending');
                 $table->unsignedInteger('responsible_id')->nullable();
                 $table->timestamps();
 
