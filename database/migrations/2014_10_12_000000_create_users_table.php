@@ -19,13 +19,9 @@ class CreateUsersTable extends Migration
                 $table->string('name');
                 $table->string('email')->unique();
                 $table->string('password');
-                $table->enum('role', ['superadmin', 'admin', 'staff', 'user'])->default('user');
-                $table->unsignedInteger('in_department')->nullable();
+                $table->enum('role', ['superadmin','admin', 'user'])->default('user');
                 $table->rememberToken();
-                $table->timestamps();
-
-                $table->index('in_department');
-                $table->foreign('in_department')->references('id')->on('departments')->onDelete('SET NULL')->onUpdate('SET NULL');
+                $table->timestamps();                
             });
         }
     }
