@@ -11,9 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'HomeController@login');
 
 
 Auth::routes();
@@ -27,47 +25,37 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('/admin/editAccount', 'AdminController@editAccount');
 
     /* User */
+    Route::get('/admin/addUser', 'AdminController@addUserGet');
+    Route::post('/admin/addUser', 'AdminController@addUserPost');
     Route::get('/admin/editUser/{id}', 'AdminController@editUser');
+    Route::post('/admin/editUser/{id}', 'AdminController@editUser');
     Route::get('/admin/deleteUser/{id}', 'AdminController@deleteUser');
 
-    /* Departments */
-    Route::get('/admin/departments', 'AdminController@departments');
-    Route::get('/admin/addDepartment', 'AdminController@addDepartment');
-    Route::post('/admin/addDepartment', 'AdminController@addDepartment');
-    Route::get('/admin/editDepartment/{id}', 'AdminController@editDepartment');
-    Route::post('/admin/editDepartment/{id}', 'AdminController@editDepartment');
-    Route::get('/admin/deleteDepartment/{id}', 'AdminController@deleteDepartment');
-    Route::post('/admin/deleteDepartment/{id}', 'AdminController@deleteDepartment');
+    /* Shops */
 
-    /* Tickets */
-    Route::get('/admin/tickets', 'AdminController@tickets');
-    Route::get('/admin/tickets/accept/{id}', 'AdminController@acceptTicket');
+    Route::get('/admin/shops', 'ShopController@index');
+    Route::get('/admin/addShop', 'ShopController@addGet');
+    Route::post('/admin/addShop', 'ShopController@addPost');
+    Route::get('/admin/editShop/{id}', 'ShopController@edit');
+    Route::post('/admin/editShop/{id}', 'ShopController@edit');
+    Route::get('/admin/deleteShop/{id}', 'ShopController@delete');
+
+    /* Gifts */
+    Route::get('/admin/gifts', 'GiftController@index');
+    Route::get('/admin/addGift', 'GiftController@addGet');
+    Route::post('/admin/addGift', 'GiftController@addPost');
+    Route::get('/admin/editGift/{id}', 'GiftController@edit');
+    Route::post('/admin/editGift/{id}', 'GiftController@edit');
+    Route::get('/admin/deleteGift/{id}', 'GiftController@delete');
+    Route::get('/admin/assignGift', 'GiftController@assignGet');
+    Route::post('/admin/assignGift', 'GiftController@assignPost');
+
+    /* Counts */
+    Route::get('/admin/giftShops', 'CountController@giftShops');
+
 });
 
-// Add/Edit User Tickets
-Route::group(['middleware' => ['ticket']], function () {
-    Route::get('/tickets/add', 'TicketsController@add');
-    Route::post('/tickets/add', 'TicketsController@add');
-    Route::get('/tickets/edit/{id}', 'TicketsController@edit');
-    Route::post('/tickets/edit/{id}', 'TicketsController@edit');
-    Route::get('/tickets/delete/{id}', 'TicketsController@delete');
-    Route::post('/tickets/delete/{id}', 'TicketsController@delete');
+Route::group(['middleware' => ['slip']], function () {
+    Route::get('/slip/home', 'HomeController@index');
+    Route::post('/addSlip', 'HomeController@addSlip');
 });
-
-// Department Administration
-Route::group(['middleware' => ['department']], function () {
-    Route::get('/departments/manage', 'DepartmentsController@manage');
-    Route::get('/departments/tickets', 'DepartmentsController@tickets');
-    Route::get('/departments/tickets/assign/{id}', 'DepartmentsController@assignTicket');
-    Route::get('/departments/staff', 'DepartmentsController@staff');
-});
-
-/* Home Controller */
-Route::get('/home', 'HomeController@index');
-Route::get('/tickets', 'HomeController@tickets');
-Route::get('/departments', 'HomeController@departments');
-Route::post('sendmessage', 'HomeController@sendMessage');
-
-/* Ajax Requests */
-
-Route::post('/departments/tickets/assign', 'DepartmentsController@assignTicketToStaff');

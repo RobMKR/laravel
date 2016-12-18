@@ -1,45 +1,72 @@
 @extends('layouts.app')
 
-@section('title', 'Laravel - Home')
+@section('title', 'JTI Armenia - Slips')
 
 @section('content')
 <div class="container">
-    @if(!empty($data['my_books']))
-        <div class="row">
-            <h2 class="text-center">My Books</h2>
-            @foreach($data['my_books'] as $book)                
-                <li class="userInfo list-group-item text-center">
-                    <span>
-                        <strong>Name: </strong>{{$book->name}} |
-                        <strong>Pages: </strong>{{$book->pages}} |
-                        <strong>Author Name: </strong>{{$book->user->name}} |
-                        <strong>Author Email: </strong>{{$book->user->email}} |
-                        <strong>Created: </strong>{{$book->created_at}} 
-                    </span>
-                    @if(Auth::user()->getLevel())
-                        <a href="{{url('/books/editBook/' . Hashids::encode($book->id))}}" class="glyphicon glyphicon-pencil"></a>
-                        <a href="{{url('/books/deleteBook/' . Hashids::encode($book->id))}}" class="glyphicon glyphicon-remove"></a>
-                    @endif
-                </li>
-            @endforeach
+    <div class="row">
+        
+
         </div>
-        <hr>
-    @endif
-    @if(!empty($data['other_books']))
-        <div class="row">
-            <h2 class="text-center">Other Books</h2>
-            @foreach($data['other_books'] as $book)
-                <li class="userInfo list-group-item text-center">
-                    <span>
-                        <strong>Name: </strong>{{$book->name}} |
-                        <strong>Pages: </strong>{{$book->pages}} |
-                        <strong>Author Name: </strong>{{$book->user->name}} |
-                        <strong>Author Email: </strong>{{$book->user->email}} 
-                    </span>
-                </li>
-            @endforeach
-        </div>
-        <hr>
-    @endif
+        {!! Form::open(['method' => 'post', 'id' => 'addSlipForm']) !!}    
+            <div class="col-sm-10 col-sm-offset-1">
+                <div id="error" class="w w-100" style="display:none;"></div>
+                <div id="success" class="w w-100" style="display:none;"></div>
+                <div class="text-center w w-100 form-group">
+                    {!! Form::select('shop_id', $shops, null, ['class' => 'form-control', 'placeholder' => 'Ընտրեք վաճառակետը']) !!}
+                </div>
+                    
+                <div class="text-center w w-50">
+                    {!! Form::text('phone','', array('class' =>'form-control', 'placeholder' => 'Հեռախոսահամար')) !!}
+                </div>
+                <div class="text-center form-group w w-25">
+                    {!! Form::text('date','', array( 'id' => 'datepicker', 'class' =>'form-control', 'placeholder' => 'Ամսաթիվ')) !!}
+                </div>
+
+                <div class="text-center form-group w w-10">
+                    <select class="form-control p2" name="hour">
+                        <option value="00">00</option>
+                        <option value="01">01</option>
+                        <option value="02">02</option>
+                        <option value="03">03</option>
+                        <option value="04">04</option>
+                        <option value="05">05</option>
+                        <option value="06">06</option>
+                        <option value="07">07</option>
+                        <option value="08">08</option>
+                        <option value="09">09</option>
+                        <option value="10" selected>10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21">21</option>
+                        <option value="22">22</option>
+                        <option value="23">23</option>
+                    </select>
+                </div>
+                <div class="text-center form-group w w-10">
+                    <select class="form-control p2" name="min">
+                        @for($i = 0; $i < 60; $i++)
+                            <option value="{{(strlen($i) == 1) ? '0' . $i : $i}}">{{(strlen($i) == 1) ? '0' . $i : $i}}</option>
+                        @endfor
+                    </select>
+                </div>
+                <input type="hidden" value="find" name="type"/>
+                <div class="name-surname-block">
+                    
+                </div>
+                <div class="text-center w w-100">
+                    {!! Form::submit('Ավելացնել կտրոնը', array('class' => 'btn btn-primary w-100')) !!}
+                </div>
+            </div>
+        {!! Form::close() !!}
+    </div>
 </div>
 @endsection

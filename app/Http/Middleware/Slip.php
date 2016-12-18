@@ -1,24 +1,25 @@
 <?php
 
 namespace App\Http\Middleware;
-use Illuminate\Support\Facades\Auth;
-use Closure;
 
-class Department
+use Closure;
+use Auth;
+
+class Slip
 {
     /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @return redirect
+     * @return mixed
      */
     public function handle($request, Closure $next)
     {
-        // Only Admins
-        if (Auth::user()->getLevel() === 2){
+        if (Auth::check() && Auth::user()->getLevel() === 1){
             return $next($request);
         }
-        return redirect('home');
+
+        return redirect('/');
     }
 }

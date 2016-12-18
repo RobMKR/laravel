@@ -18,9 +18,18 @@
                     <h6>User Email</h6>
                    {!! Form::text('email', null , array('placeholder'=>'User Email', 'class' =>'form-control')) !!}
                 </div>
-                <div class="form-group text-center">
-                    <h6>User Role</h6>
-                    {!! Form::select('role', $data['roles'] ,null, array('placeholder' => 'Select Role', 'class' =>'form-control')) !!}
+                <div class="text-center">
+                    <h6>User Type</h6>
+
+                    <span>Slip assistant</span>
+                    {!! Form::radio('role','user', null , array('class' =>'radio-control')) !!}
+
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+                    <span>Gift assistant</span>
+                    {!! Form::radio('role','admin', null, array('class' =>'radio-control')) !!}
+
+                    <br/><br/>
                 </div>
                 <div class="text-center">
                     {!! Form::submit('Edit User', array('class' => 'btn brownBtn')) !!}

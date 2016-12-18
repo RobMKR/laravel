@@ -78,6 +78,29 @@ class AdminController extends Controller
         return view('admin/edit_account')->with('data', $user);
     }
 
+    public function addUserGet(){
+        return view('admin/addUser');
+    }
+
+    public function addUserPost(Request $request){
+        $this->validate($request, [
+            'name' => 'required|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|min:6|confirmed:',
+            'role' => 'required|in:user,admin'
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'role' => $request->role
+        ]);
+        Session::flash('success', 'User Created');
+        return redirect('/admin');
+
+    }
+
     /**
      * Edit User
      *

@@ -7,31 +7,6 @@ li.departmentInfo a.glyphicon {
     /* top: 20px; */
     right: 20px;
 }
-.notification-bar {
-   	width: 500px;
-    position: fixed;
-    bottom: 0;
-    padding-bottom: 0;
-    right: 0;
-    text-align: center;
-}
-.notification-bar .panel {
-	margin: 0;
-}
-.notification-bar .panel-body {
-	display: none;
-}
-.notification-bar .panel-heading {
-	cursor: pointer;
-}
-#messages{
-	text-align: initial;
-    border: 1px solid black;
-    height: 300px;
-    margin-bottom: 8px;
-    overflow: auto;
-    padding: 5px;
-}
 .fr {
     float:right;
 }
@@ -45,4 +20,89 @@ li.departmentInfo a.glyphicon {
 }
 .btn-group {
     margin-top: 15px;
+}
+.clearfix:after {
+    content: " ";
+    display: block;
+    clear: both;
+}
+.header {
+    margin-bottom: 25px;
+}
+.fl {
+    float: left;
+}
+.fr {
+    float: right;
+}
+.page-title {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 20px;
+}
+.gift-img {
+    width: 70px;
+    height: 70px;
+}
+.gift-img img {
+    width: 100%;
+    vertical-align: middle;
+}
+.gift-ico {
+    width: 70px;
+    height: 70px;
+    font-size: 28px;
+    text-align: center;
+}
+div.text-center {
+    margin: 10px 0;
+}
+td a {
+    display: block;
+    text-align: center;
+}
+.w {
+    float: left;
+    box-sizing: border-box;
+    padding: 10px;
+}
+.w-100 {
+    width: 100%;
+}
+.w-75 {
+    width: 75%;
+}
+.w-50 {    
+    width: 50%;
+}
+.w-25 {
+    width: 25%;
+}
+.w-10 {
+    width: 12.5%;
+}
+.p2 {
+    padding: 2px;
+}
+#error {
+    color: #ff4c4c;
+    text-align: center;
+    font-weight: bold;
+}
+#success {
+    color:#008000;
+    text-align: center;
+    font-weight: bold;
+}
+.loader {
+    z-index: 9999;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255,255,255, 0.7);
 }
