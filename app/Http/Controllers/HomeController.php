@@ -11,7 +11,10 @@ use App\Slip;
 use App\ClientGift;
 
 class HomeController extends Controller
-{
+{   
+
+    protected $redirectAfter = '/';
+
     /**
      * Create a new controller instance.
      *
@@ -24,7 +27,18 @@ class HomeController extends Controller
 
     public function login(){
         if(Auth::check()){
-            return redirect('/slip/home');
+            switch(Auth::user()->getLevel()){
+                case 3 :
+                    $this->redirectAfter = '/admin';
+                    break;
+                case 2 :
+                    break;
+                case 1 : 
+                    $this->redirectAfter = '/slip/home';
+                    break;
+            }
+
+            return redirect($this->redirectAfter);
         }
         return view('welcome');
     }
