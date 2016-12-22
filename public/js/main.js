@@ -1,6 +1,12 @@
 $(function(){
 	$( "#datepicker" ).datepicker({
-		dateFormat: 'yy/mm/dd'
+		dateFormat: 'dd/mm/yy',
+		firstDay: 1
+	});
+
+	$("#datepicker").click(function(){
+		$(this).blur();
+		return false;
 	});
 
 	$('#addSlipForm').submit(function(e){
@@ -15,11 +21,19 @@ $(function(){
 		var name = $this.find('input[name="name"]').val();
 		var surname = $this.find('input[name="surname"]').val();
 		var shop_id = $this.find('select[name="shop_id"]').val();
+		var count = $this.find('select[name="count"]').val();
 
 		if(phone == '' || date == '' || shop_id == ''){
 			$('#error').html('Լրացրեք բոլոր դաշտերը');
 			$('#error').show();
 			return false;
+		}
+
+		if(phone.length !== 8){
+			$('#error').html('Մուտքագրեք 8 նիշանոց հեռախոսահամար');
+			$('#error').show();
+			return false;
+
 		}
 
 		var data = {
@@ -28,7 +42,8 @@ $(function(){
 			phone : phone,
 			date : date,
 			time : time,
-			shop_id : shop_id	
+			shop_id : shop_id,
+			count : count	
 		};
 
 		if(type == 'register'){

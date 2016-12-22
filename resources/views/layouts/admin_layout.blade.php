@@ -60,6 +60,16 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                            Consumers <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="{{url('/admin/consumerSlips')}}" role="button">Slips</a></li>
+                            <li><a href="{{url('/admin/consumerAvailableGifts')}}" role="button">Available Gifts</a></li>
+                            <li><a href="{{url('/admin/consumerTakenGifts')}}" role="button">Taken Gifts</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                             Counts <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">

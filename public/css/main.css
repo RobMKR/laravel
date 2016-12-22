@@ -1,3 +1,10 @@
+html, body {
+    height: 100%;
+}
+body {
+    background-color: #122632;
+}
+
 li.departmentInfo a.glyphicon {
  	padding-left: 10px;
 }
@@ -75,6 +82,9 @@ td a {
 .w-50 {    
     width: 50%;
 }
+.w-30 {
+    width: 30%;
+}
 .w-25 {
     width: 25%;
 }
@@ -90,7 +100,7 @@ td a {
     font-weight: bold;
 }
 #success {
-    color:#008000;
+    color:#58ceaa;;
     text-align: center;
     font-weight: bold;
 }
@@ -105,4 +115,9 @@ td a {
     justify-content: center;
     align-items: center;
     background: rgba(255,255,255, 0.7);
+}
+.radio-btns {
+    height: 34px;
+    border-radius: 4px;
+    background: #fff;
 }

@@ -53,6 +53,10 @@ Route::group(['middleware' => ['admin']], function () {
     /* Counts */
     Route::get('/admin/giftShops', 'CountController@giftShops');
 
+    /* Consumers */
+    Route::get('/admin/consumerSlips', 'CountController@consumerSlips');
+    Route::get('/admin/consumerAvailableGifts', 'CountController@consumerAvailableGifts');
+
 });
 
 Route::group(['middleware' => ['slip']], function () {

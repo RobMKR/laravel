@@ -59,7 +59,7 @@ class HomeController extends Controller
                 'phone' => 'required|numeric',
                 'date' => 'required',
                 'time' => 'required',
-                'shop_id' => 'required'
+                'shop_id' => 'required',
             ]);
 
             $client = Client::getByPhone($request->phone);
@@ -85,7 +85,9 @@ class HomeController extends Controller
             $client->save();
         }
 
-        $week_id = Week::getWeekId($request->date . ' ' . $request->time);
+        $new_date = date("Y-m-d", strtotime(str_replace('/', '-', $request->date)));
+
+        $week_id = Week::getWeekId($new_date . ' ' . $request->time);
 
         if($week_id === null){
             return response()->json(['status' => 404, 'err' => 'Տվյալ ամսաթվով խաղարկություն չի գտնվել']);
@@ -98,16 +100,16 @@ class HomeController extends Controller
 
             $slip->client_id = $client['id'];
             $slip->week_id = $week_id;
-            $slip->slip_count = 1;
+            $slip->slip_count = $request->count;
 
             $slip->save();
 
-            $msg = 'Կտրոնների քանակ : 1';
+            $msg = 'Կտրոնների քանակ : ' . $request->count;
         }else{
-            $slip->increment('slip_count');
-            $msg = 'Կտրոնների քանակ : '.$slip->slip_count;
+            $overall = $slip->slip_count + (int) $request->count;
+            $msg = 'Կտրոնների քանակ : ' . $overall;
 
-            if($slip->slip_count == 7){
+            if($slip->slip_count < 7 && $overall > 6){
                 $ClientGift = new ClientGift();
 
                 $ClientGift->client_id = $client->id;
@@ -117,7 +119,9 @@ class HomeController extends Controller
                 $ClientGift->save();
 
                 $msg .= ', Հաճախորդը հավաքեց պահանջված միավորների քանակ';
-            }                      
+            }
+
+            $slip->increment('slip_count', (int) $request->count);                                  
         }
 
         return response()->json(['status' => 200, 'msg' => $msg]);
