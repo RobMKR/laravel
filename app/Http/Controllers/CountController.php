@@ -8,6 +8,8 @@ use App\Http\Requests;
 use App\Shop;
 use App\Gift;
 use App\ShopGift;
+use App\Slip;
+use App\ClientGift;
 
 class CountController extends Controller
 {
@@ -28,5 +30,26 @@ class CountController extends Controller
         }
 
     	return view('admin/giftShops')->with('data', $viewData);
+    }
+
+    public function consumerSlips(){
+        $Slip = new Slip();
+        $viewData['slips'] = $Slip
+            ->join('clients', 'clients.id', '=', 'client_week_slips.client_id')
+            ->join('weeks', 'weeks.id', '=', 'client_week_slips.week_id')
+            ->paginate(50);
+
+        return view('admin/consumerSlips')->with('data', $viewData);   
+    }
+
+    public function consumerAvailableGifts(){
+        $ClientGift = new ClientGift();
+        $viewData['gifts'] = $ClientGift
+            ->whereNull('gift_id')
+            ->join('clients', 'clients.id', '=', 'client_gift_weeks.client_id')
+            ->join('weeks', 'weeks.id', '=', 'client_gift_weeks.week_id')
+            ->join('shops', 'shops.id', '=', 'client_gift_weeks.shop_id')
+            ->paginate(50);
+        return view('admin/consumerAvailableGifts')->with('data', $viewData); 
     }
 }
