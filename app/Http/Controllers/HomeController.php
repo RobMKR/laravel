@@ -9,6 +9,7 @@ use App\Shop;
 use App\Week;
 use App\Slip;
 use App\ClientGift;
+use App\Gift;
 
 class HomeController extends Controller
 {   
@@ -32,6 +33,7 @@ class HomeController extends Controller
                     $this->redirectAfter = '/admin';
                     break;
                 case 2 :
+                    $this->redirectAfter = '/gift/home';
                     break;
                 case 1 : 
                     $this->redirectAfter = '/slip/home';
@@ -105,6 +107,18 @@ class HomeController extends Controller
             $slip->save();
 
             $msg = 'Կտրոնների քանակ : ' . $request->count;
+
+            if($request->count > 6){
+                $ClientGift = new ClientGift();
+
+                $ClientGift->client_id = $client->id;
+                $ClientGift->shop_id = $request->shop_id;
+                $ClientGift->week_id = $week_id;
+
+                $ClientGift->save();
+                $msg .= ', Հաճախորդը հավաքեց պահանջված միավորների քանակ';
+            }
+            
         }else{
             $overall = $slip->slip_count + (int) $request->count;
             $msg = 'Կտրոնների քանակ : ' . $overall;
@@ -127,5 +141,49 @@ class HomeController extends Controller
         return response()->json(['status' => 200, 'msg' => $msg]);
     }
 
+    public function getGifts(){
+        return view('gifts');
+    }
 
+    public function getClient(Request $request){
+        $phone = $request->phone;
+        $client = Client::where('phone', $phone)->first();
+
+        if(empty($client)){
+            return response()->json(['msg' => 'ՆՇՎԱԾ ՀԵՌԱԽՈՍԱՀԱՄԱՐՈՎ ՄԱՍՆԱԿԻՑ ՉԻ ԳՏՆՎԵԼ'], 422);
+        }
+
+        $client_gifts['available'] = ClientGift::where('client_id', $client->id)
+            ->whereNull('gift_id')
+            ->join('shops', 'shops.id', '=', 'client_gift_weeks.shop_id')
+            ->join('weeks', 'weeks.id', '=', 'client_gift_weeks.week_id')
+            ->orderBy('week_id')
+            ->first([
+                'client_gift_weeks.id', 
+                'shops.id as ShopId', 
+                'shops.full_name as ShopName', 
+                'weeks.id as WeekId', 
+                'weeks.start as WeekStart', 
+                'weeks.end as WeekEnd'
+            ]);
+
+        $client_gifts['taken'] = ClientGift::where('client_id', $client->id)
+            ->whereNotNull('gift_id')
+            ->join('shops', 'shops.id', '=', 'client_gift_weeks.shop_id')
+            ->join('weeks', 'weeks.id', '=', 'client_gift_weeks.week_id')
+            ->join('gifts', 'gifts.id', '=', 'client_gift_weeks.gift_id')
+            ->get([
+                'client_gift_weeks.id',
+                'shops.id as ShopId', 
+                'shops.full_name as ShopName',
+                'weeks.id as WeekId', 
+                'weeks.start as WeekStart', 
+                'weeks.end as WeekEnd',
+                'gifts.id as GiftId',
+            ])->keyBy('GiftId');
+
+        $gifts = Gift::orderBy('week_order')->get()->keyBy('week_order');
+
+        return response()->json(['data' => $client_gifts, 'gifts' => $gifts, 'client' => $client], 200);
+    }
 }
