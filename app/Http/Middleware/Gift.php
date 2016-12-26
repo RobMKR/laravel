@@ -4,8 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Auth;
-
-class Slip
+class Gift
 {
     /**
      * Handle an incoming request.
@@ -16,7 +15,7 @@ class Slip
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::check() && (Auth::user()->getLevel() === 1 || Auth::user()->getLevel() === 3)){
+        if (Auth::check() && (Auth::user()->getLevel() === 2 || Auth::user()->getLevel() === 3)){
             return $next($request);
         }
 

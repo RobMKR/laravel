@@ -121,3 +121,44 @@ td a {
     border-radius: 4px;
     background: #fff;
 }
+.passport-screen {
+    height: 250px;
+    background: #fff;
+    width: 50%;
+    text-align: center;
+    margin: 25px auto;
+    border-radius: 4px;
+}
+.passport-screen img {
+    height: 100%;
+    padding: 10px;
+}
+.gift-row {
+    background: #fff;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px;
+}
+.gift-row div {
+    display: inline-block;
+    text-align: center;
+}
+.gift-row .key {
+    width: 10%;
+    font-size: 18px;
+}
+.gift-row .icon {
+    font-size: 18px;
+    width: 15%;
+}
+.gift-row .name {
+    font-size: 18px;
+    width: 50%;
+}
+.gift-row.taken {
+    background: #a8ff37;
+}
+.gift-row.unavailable {
+    background: #635d5d;
+    color: #fff;
+}

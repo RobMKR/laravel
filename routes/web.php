@@ -63,3 +63,8 @@ Route::group(['middleware' => ['slip']], function () {
     Route::get('/slip/home', 'HomeController@index');
     Route::post('/addSlip', 'HomeController@addSlip');
 });
+
+Route::group(['middleware' => ['gift']], function(){
+    Route::get('/gift/home', 'HomeController@getGifts');
+    Route::post('/getClient', 'HomeController@getClient');
+});
