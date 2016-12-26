@@ -142,7 +142,7 @@ class AdminController extends Controller
     	$viewData['user'] = $user;
 
     	// Getting Available Roles for User
-    	$viewData['roles'] = User::getRoles(Auth::user()->role);
+    	$viewData['roles'] = ['user' => 'Slip Assistant', 'admin' => 'Gift Assistant'];
 
     	return view('admin/edit_user')->with('data', $viewData);
     }
