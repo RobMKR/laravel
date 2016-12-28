@@ -114,6 +114,7 @@ class HomeController extends Controller
                 $ClientGift->client_id = $client->id;
                 $ClientGift->shop_id = $request->shop_id;
                 $ClientGift->week_id = $week_id;
+                $ClientGift->last_slip_date = $new_date . ' ' . $request->time;
 
                 $ClientGift->save();
                 $msg .= ', Հաճախորդը հավաքեց պահանջված միավորների քանակ';
@@ -153,37 +154,27 @@ class HomeController extends Controller
             return response()->json(['msg' => 'ՆՇՎԱԾ ՀԵՌԱԽՈՍԱՀԱՄԱՐՈՎ ՄԱՍՆԱԿԻՑ ՉԻ ԳՏՆՎԵԼ'], 422);
         }
 
-        $client_gifts['available'] = ClientGift::where('client_id', $client->id)
-            ->whereNull('gift_id')
-            ->join('shops', 'shops.id', '=', 'client_gift_weeks.shop_id')
-            ->join('weeks', 'weeks.id', '=', 'client_gift_weeks.week_id')
-            ->orderBy('week_id')
-            ->first([
-                'client_gift_weeks.id', 
-                'shops.id as ShopId', 
-                'shops.full_name as ShopName', 
-                'weeks.id as WeekId', 
-                'weeks.start as WeekStart', 
-                'weeks.end as WeekEnd'
-            ]);
+        $id = $client['id'];
 
-        $client_gifts['taken'] = ClientGift::where('client_id', $client->id)
+        $data['not_reserved'] = ClientGift::where('client_id', $id)
+            ->whereNull('gift_id')
+            ->where('reserved_id', '0')->count();
+
+        $data['taken_gifts'] = ClientGift::where('client_id', $id)
             ->whereNotNull('gift_id')
-            ->join('shops', 'shops.id', '=', 'client_gift_weeks.shop_id')
-            ->join('weeks', 'weeks.id', '=', 'client_gift_weeks.week_id')
             ->join('gifts', 'gifts.id', '=', 'client_gift_weeks.gift_id')
-            ->get([
-                'client_gift_weeks.id',
-                'shops.id as ShopId', 
-                'shops.full_name as ShopName',
-                'weeks.id as WeekId', 
-                'weeks.start as WeekStart', 
-                'weeks.end as WeekEnd',
-                'gifts.id as GiftId',
-            ])->keyBy('GiftId');
+            ->select('gifts.name as GiftName' , 'gifts.id as GiftId')
+            ->get()->keyBy('GiftId')->toArray();
+
+        $data['reserved_gifts'] = ClientGift::where('client_id', $id)
+            ->whereNotIn('reserved_id', array_keys($data['taken_gifts']))
+            ->whereNotNull('reserved_id')
+            ->join('gifts', 'gifts.id', '=', 'client_gift_weeks.reserved_id')
+            ->select('gifts.name as GiftName', 'gifts.id as GiftId')
+            ->get()->keyBy('GiftId')->toArray();
 
         $gifts = Gift::orderBy('week_order')->get()->keyBy('week_order');
 
-        return response()->json(['data' => $client_gifts, 'gifts' => $gifts, 'client' => $client], 200);
+        return response()->json(['data' => $data, 'gifts' => $gifts, 'client' => $client], 200);
     }
 }

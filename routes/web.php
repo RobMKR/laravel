@@ -56,6 +56,11 @@ Route::group(['middleware' => ['admin']], function () {
     /* Consumers */
     Route::get('/admin/consumerSlips', 'CountController@consumerSlips');
     Route::get('/admin/consumerAvailableGifts', 'CountController@consumerAvailableGifts');
+    Route::get('/admin/consumerTakenGifts', 'CountController@consumerTakenGifts');
+    Route::post('/admin/getGiftsAjax', 'CountController@getGiftsAjax');
+
+    Route::get('/admin/sendSmsSandbox', 'CountController@sendSmsSendbox');
+    Route::get('/admin/sendSmsReal', 'CountController@sendSmsReal');
 
 });
 
