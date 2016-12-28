@@ -12,6 +12,7 @@ use App\Slip;
 use App\ClientGift;
 use App\Week;
 use DB;
+use Session;
 
 class CountController extends Controller
 {
@@ -50,6 +51,7 @@ class CountController extends Controller
 
         $viewData['gifts'] = $ClientGift
             ->whereNull('gift_id')
+            ->whereNull('reserved_id')
             ->join('clients', 'clients.id', '=', 'client_gift_weeks.client_id')
             ->join('weeks', 'weeks.id', '=', 'client_gift_weeks.week_id')
             ->join('shops', 'shops.id', '=', 'client_gift_weeks.shop_id')
@@ -108,6 +110,10 @@ class CountController extends Controller
     public function getGiftsAjax(Request $request){
         $id = $request->id;
 
+        $data['late_gifts'] = ClientGift::where('client_id', $id)
+            ->where('reserved_id', 0)
+            ->count();
+
         $data['taken_gifts'] = ClientGift::where('client_id', $id)
             ->whereNotNull('gift_id')
             ->join('gifts', 'gifts.id', '=', 'client_gift_weeks.gift_id')
@@ -135,7 +141,10 @@ class CountController extends Controller
 
         foreach($client_gifts as $client_gift){
             $gift_order = ClientGift::where('client_id', $client_gift->client_id)
-                ->whereNotNull('gift_id')
+                ->where(function($q){
+                    $q->whereNotNull('gift_id');
+                    $q->orWhereNotNull('reserved_id');
+                })
                 ->count() + 1;
             $gift_id = Gift::where('week_order', $gift_order)->first()['id'];
 
@@ -149,6 +158,10 @@ class CountController extends Controller
                 $client_gift->save();
             }
         }
+
+        Session::flash('success', 'Gifts Reserved for consumers');
+        return redirect()->back();
+
     }
 
     public function sendSmsReal(){
