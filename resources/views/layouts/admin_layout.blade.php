@@ -16,6 +16,9 @@
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/font-awesome.min.css" rel="stylesheet">
 
+    <link href="/css/magnific-popup.css" rel="stylesheet">
+
+
     <!-- Scripts -->
     <script src="/js/jquery.js"></script>
     <script src="/js/msg.js"></script>
@@ -136,5 +139,6 @@
 
     @yield('content')
     <script src="/js/app.js"></script>
+    <script src="/js/jquery.magnific-popup.min.js"></script>
 </body>
 </html>

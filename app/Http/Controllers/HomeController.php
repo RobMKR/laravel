@@ -114,6 +114,7 @@ class HomeController extends Controller
                 $ClientGift->client_id = $client->id;
                 $ClientGift->shop_id = $request->shop_id;
                 $ClientGift->week_id = $week_id;
+                $ClientGift->last_slip_date = $new_date . ' ' . $request->time;
 
                 $ClientGift->save();
                 $msg .= ', Հաճախորդը հավաքեց պահանջված միավորների քանակ';
