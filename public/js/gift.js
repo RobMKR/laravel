@@ -137,6 +137,10 @@ $(function(){
 			yearRange: '-100:+0',
 			defaultDate: '01/01/1980'
 		});
+
+		$('#datepicker_pass, #datepicker_dob').click(function(){
+			return false;
+		});
 	}
 
 	function drawClientGifts(data, gifts){
