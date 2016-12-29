@@ -61,7 +61,6 @@ Route::group(['middleware' => ['admin']], function () {
 
     Route::get('/admin/sendSmsSandbox', 'CountController@sendSmsSendbox');
     Route::get('/admin/sendSmsReal', 'CountController@sendSmsReal');
-
 });
 
 Route::group(['middleware' => ['slip']], function () {
@@ -72,4 +71,5 @@ Route::group(['middleware' => ['slip']], function () {
 Route::group(['middleware' => ['gift']], function(){
     Route::get('/gift/home', 'HomeController@getGifts');
     Route::post('/getClient', 'HomeController@getClient');
+    Route::post('/saveClientGift', 'HomeController@saveGift');
 });

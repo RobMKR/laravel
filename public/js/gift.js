@@ -53,10 +53,54 @@ $(function(){
 	$('#giveGiftForm').submit(function(e){
 		e.preventDefault();
 		var $this = $(this);
+		var _gifts = $this.find(".checkboxX input");
+		var gifts = [];
+		$.each(_gifts, function(){
+			$_this = $(this);
+			if(($_this).prop('checked')){
+				gifts.push($_this.val());
+			}
+		});
+		console.log(gifts);
+		var data = {
+			_token : Laravel.csrfToken,
+			client : $this.find('input[name="client"]').val(),
+			name : $this.find('input[name="name"]').val(),
+			surname : $this.find('input[name="surname"]').val(),
+			birth_date : $this.find('input[name="birth_date"]').val(),
+			passport_id : $this.find('input[name="passport_id"]').val(),
+			passport_given_date : $this.find('input[name="passport_given_date"]').val(),
+			passport_b64 : $this.find('input[name="passport_b64"]').val(),
+			gifts : JSON.stringify(gifts)
+		};
 
-		if($this.find('[name="shop"]').length == 0 || $this.find('[name="gift"]').length == 0){
-			$('#error').html('ՄԱՍՆԱԿԻՑԸ ՉԻ ԱՐԺԱՆԱՑԵԼ ՀԱՄԱՊԱՏՍԽԱՆ ՆՎԵՐԻ');
-			$('#error').show();
+		if(data.name == ''){
+			alert('ՄՈՒՏՔԱԳՐԵՔ ՄԱՍՆԱԿՑԻ ԱՆՈՒՆԸ');
+			return false;
+		}
+
+		if(data.surname == ''){
+			alert('ՄՈՒՏՔԱԳՐԵՔ ՄԱՍՆԱԿՑԻ ԱԶԳԱՆՈՒՆԸ');
+			return false;
+		}
+
+		if(data.birth_date == ''){
+			alert('ՄՈՒՏՔԱԳՐԵՔ ՄԱՍՆԱԿՑԻ ԾՆՆԴՅԱՆ ԱՄՍԱԹԻՎԸ');
+			return false;
+		}
+
+		if(data.passport_id == ''){
+			alert('ՄՈՒՏՔԱԳՐԵՔ ՄԱՍՆԱԿՑԻ ԱՆՁՆԱԳՐԻ ՍԵՐԻԱՆ');
+			return false;
+		}
+
+		if(data.passport_given_date == ''){
+			alert('ՄՈՒՏՔԱԳՐԵՔ ՄԱՍՆԱԿՑԻ ԱՆՁՆԱԳՐԻ ՏՐՄԱՆ ԱՄՍԱԹԻՎԸ');
+			return false;
+		}
+
+		if(data.passport_b64 == ''){
+			alert('ՆԵՐԲԵՌՆԵՔ ՄԱՍՆԱԿՑԻ ԱՆՁՆԱԳՐԻ ՆԿԱՐԸ');
 			return false;
 		}
 
@@ -67,12 +111,21 @@ $(function(){
 				return false;
 			}
 		}
-		/****
-		*
-		*  Using Form Data, need to do AJAX File Upload to Server....	
-		*  
-		*
-		*/
+
+		$('body').append('<div class="loader"><img src="/img/popup_loader.gif" alt=""></div>');
+
+		$.ajax({
+            url : '/saveClientGift',
+            type : 'POST',
+            data : data,
+            success : function(rsp){
+				
+            	$('.loader').remove();
+            },
+            error : function(rsp){
+            	$('.loader').remove();
+            }
+        });
 
 	});
 
@@ -110,10 +163,10 @@ $(function(){
 		client_info += '<div class="passport-screen">';
 
 		if(client.passport_screen){
-			client_info += '<input type="hidden" name="passport" value="' + client.passport_screen + '"/>';
 			client_info += '<img src="' + client.passport_screen + '"/>';
 		}else{
 			client_info += '<input id="passport" type="file" name="passport" value="" style="display:none;"/>';
+			client_info += '<input type="hidden" id="b64_pass" name="passport_b64"/>';
 			client_info += '<img id="passportHandler" src="/img/addPassport.png"/>';
 		}
 		client_info += '</div>';
@@ -200,7 +253,15 @@ $(function(){
     }
 
 	$(document).on('change', '#passport', function(){
-        readURL(this);
+		readURL(this);
+
+		if (this.files && this.files[0]) {
+		    var FR= new FileReader();
+		    FR.onload = function(e) {
+			    $("#b64_pass").val(e.target.result);
+		    };       
+		    FR.readAsDataURL( this.files[0] );
+	 	}
     });
 
 	$(document).on('click', '#passportHandler', function(){
