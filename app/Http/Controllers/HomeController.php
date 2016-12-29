@@ -163,14 +163,16 @@ class HomeController extends Controller
         $data['taken_gifts'] = ClientGift::where('client_id', $id)
             ->whereNotNull('gift_id')
             ->join('gifts', 'gifts.id', '=', 'client_gift_weeks.gift_id')
-            ->select('gifts.name as GiftName' , 'gifts.id as GiftId')
+            ->join('shops', 'shops.id', '=', 'client_gift_weeks.shop_id')
+            ->select('gifts.name as GiftName' , 'gifts.id as GiftId', 'shops.id as ShopId')
             ->get()->keyBy('GiftId')->toArray();
 
         $data['reserved_gifts'] = ClientGift::where('client_id', $id)
             ->whereNotIn('reserved_id', array_keys($data['taken_gifts']))
             ->whereNotNull('reserved_id')
             ->join('gifts', 'gifts.id', '=', 'client_gift_weeks.reserved_id')
-            ->select('gifts.name as GiftName', 'gifts.id as GiftId')
+            ->join('shops', 'shops.id', '=', 'client_gift_weeks.shop_id')
+            ->select('gifts.name as GiftName', 'gifts.id as GiftId', 'shops.id as ShopId')
             ->get()->keyBy('GiftId')->toArray();
 
         $gifts = Gift::orderBy('week_order')->get()->keyBy('week_order');
