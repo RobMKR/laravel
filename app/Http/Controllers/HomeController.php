@@ -179,4 +179,8 @@ class HomeController extends Controller
 
         return response()->json(['data' => $data, 'gifts' => $gifts, 'client' => $client], 200);
     }
+
+    public function saveGift(Request $request){
+        dd($request->all());
+    }
 }
