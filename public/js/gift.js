@@ -1,5 +1,4 @@
 $(function(){
-	window.not_reserved = 0;
 	window.max_gifts = 0;
 
 	var size = function(obj) {
@@ -147,33 +146,35 @@ $(function(){
 		var container = $('.clientGiftsBody');
 		var class_name = '';
 		var gift_info = '';
-		var shop_info;
+		var shop_id;
 		var check;
-		window.not_reserved = data.not_reserved;
-		window.max_gifts = data.not_reserved + size(data.reserved_gifts);
-		console.log(size(data.reserved_gifts))
+		window.max_gifts = size(data.reserved_gifts);
 
 		$.each(gifts, function(key, value){
 			checked  = false;
+			reserved = false;
 			class_name = 'unavailable';
 			if(data.taken_gifts[value.id] !== undefined){
 				class_name = 'taken';
 				checked = true;
-			}else{
-				if(data.reserved_gifts[value.id] !== undefined){
-					class_name = 'reserved';
-				}else if(data.not_reserved){
-					class_name = 'not_reserved';
-				}
+				shop_id = data.taken_gifts[value.id]["ShopId"];
+			}else if(data.reserved_gifts[value.id] !== undefined){
+				class_name = 'reserved';
+				reserved = true;
+				shop_id = data.reserved_gifts[value.id]["ShopId"];
 			}
 			gift_info += '<div class="gift-row ' + class_name + '">';
 				gift_info += '<div class="key"><span>' + key + '</span></div>'
 				gift_info += '<div class="icon"><span><i class="fa ' + value.icon_class + '"></i></span></div>';
 				gift_info += '<div class="name"><span>' + value.name + '</span></div>';
 				if(checked){
-					gift_info += '<div class="checkboxX"><input type="checkbox" name="gifts[]" value="' + value.id + '" disabled/></div>';
+					gift_info += '<div class="checkboxX"><input type="checkbox" name="gifts[]" value="' + value.id + '||' + shop_id + '" disabled/></div>';
 				}else{
-					gift_info += '<div class="checkboxX"><input type="checkbox" name="gifts[]" value="' + value.id + '"/></div>';
+					if(reserved){
+						gift_info += '<div class="checkboxX"><input type="checkbox" name="gifts[]" value="' + value.id + '||' + shop_id +'"/></div>';
+					}else{
+						gift_info += '<div class="checkboxX"><input type="checkbox" name="gifts[]" value="' + value.id + '||' + shop_id +'"/ disabled></div>';
+					}
 				}
 			gift_info += '</div>';
 		});

@@ -70,7 +70,8 @@
 
     <script type="text/javascript">
         $(function(){
-            $('.gift').click(function(){
+            $('.gift').click(function(e){
+                e.preventDefault();
                 var id = $(this).attr('data-id');
                 var name =  $(this).attr('data-name');
 
