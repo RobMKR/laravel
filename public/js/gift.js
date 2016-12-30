@@ -119,10 +119,17 @@ $(function(){
             type : 'POST',
             data : data,
             success : function(rsp){
-				
-            	$('.loader').remove();
+				$('#error').hide();
+				$('#takeGiftForm').submit();
             },
             error : function(rsp){
+            	$resp = JSON.parse(rsp.responseText);
+            	$('#succes').hide();
+            	if($resp.passport_id !== undefined){
+            		alert('ՏՎՅԱԼ ԱՆՁՆԱԳՐՈՎ ՄԱՍՆԱԿԻՑ ԱՐԴԵՆ ԿԱ');
+            	}
+
+            	console.log($resp);
             	$('.loader').remove();
             }
         });
