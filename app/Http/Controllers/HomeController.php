@@ -181,6 +181,42 @@ class HomeController extends Controller
     }
 
     public function saveGift(Request $request){
-        dd($request->all());
+        $id = $request->client;
+        $client = Client::find($id);
+
+        $this->validate($request, [
+            'name' => 'required',
+            'surname' => 'required',
+            'birth_date' => 'required',
+            'passport_id' => 'required|unique:clients,passport_id,' . $id,
+            'passport_given_date' => 'required',
+        ]);
+
+        $client->name = $request->name;
+        $client->surname = $request->surname;
+        $client->birth_date = $new_date = date("Y-m-d", strtotime(str_replace('/', '-', $request->birth_date)));
+
+        $client->passport_id = $request->passport_id;
+        $client->passport_given_date = date("Y-m-d", strtotime(str_replace('/', '-', $request->passport_given_date)));
+        if($request->has('passport_b64')){
+            $client->passport_screen = Client::createImg($request->passport_b64);
+        }
+
+        $client->save();
+
+        if(!empty($request->gifts)){
+            foreach(json_decode($request->gifts) as $_gift){
+                $gift_and_shop = explode('||', $_gift);
+                $gift = $gift_and_shop[0];
+                $shop = $gift_and_shop[1];
+
+                $client_gift = ClientGift::where('shop_id', $shop)->where('reserved_id', $gift)->where('client_id', $id)->first();
+
+                $client_gift->gift_id = $gift;
+                $client_gift->save();
+            }
+        }
+
+        dd(json_decode($request->gifts));
     }
 }
