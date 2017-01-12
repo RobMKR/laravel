@@ -94,6 +94,11 @@ $(function(){
 			return false;
 		}
 
+		if(data.passport_id.length !== 9){
+			alert('ՍԽԱԼ ԱՆՁՆԱԳՐԻ ՍԵՐԻԱ');
+			return false;
+		}
+
 		if(data.passport_given_date == ''){
 			alert('ՄՈՒՏՔԱԳՐԵՔ ՄԱՍՆԱԿՑԻ ԱՆՁՆԱԳՐԻ ՏՐՄԱՆ ԱՄՍԱԹԻՎԸ');
 			return false;
