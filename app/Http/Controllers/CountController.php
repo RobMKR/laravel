@@ -147,6 +147,11 @@ class CountController extends Controller
                 })
                 ->count() + 1;
             $gift_id = Gift::where('week_order', $gift_order)->first()['id'];
+			if($gift_id == null){
+				$client_gift->reserved_id = 0;
+                $client_gift->save();
+				continue;
+			}
 
             $ShopGift = ShopGift::where('shop_id', $client_gift->shop_id)->where('gift_id', $gift_id)->first();
             if(($ShopGift->count - $ShopGift->used) > 0){
