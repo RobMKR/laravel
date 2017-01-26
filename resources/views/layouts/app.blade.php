@@ -15,6 +15,9 @@
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/main.css" rel="stylesheet">
     <link href="/css/jquery-ui.theme.min.css" rel="stylesheet">
+
+    <link href="/css/magnific-popup.css" rel="stylesheet">
+
     
     <link href="/css/font-awesome.min.css" rel="stylesheet">
     <link href="/css/jquery-ui.min.css" rel="stylesheet">
@@ -23,6 +26,7 @@
     <script src="/js/app.js"></script>
     <script src="/js/jquery.js"></script>
     <script type="text/javascript" src="/js/jquery-ui.min.js"></script>
+    <script src="/js/jquery.magnific-popup.min.js"></script>
     <script>
         window.Laravel = <?php echo json_encode([
             'csrfToken' => csrf_token(),

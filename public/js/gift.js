@@ -9,6 +9,10 @@ $(function(){
 	    return size;
 	};
 
+	$('.agreement-cancel .btn').click(function(){
+		$.magnificPopup.close();
+	});
+
 	$('#takeGiftForm').submit(function(e){
 		e.preventDefault();
 		resetForm();
@@ -48,6 +52,21 @@ $(function(){
             }
         });
 
+	});
+
+	$('.submit-form').click(function(e){
+		e.preventDefault();
+		$.magnificPopup.open({
+			items: {
+			    src: '#agreement'
+		    },
+		    type: 'inline'
+		});
+	});
+
+	$('.agreement-ok').click(function(){
+		$.magnificPopup.close();
+		$('.submit-form').submit();
 	});
 
 	$('#giveGiftForm').submit(function(e){
@@ -133,8 +152,6 @@ $(function(){
             	if($resp.passport_id !== undefined){
             		alert('ՏՎՅԱԼ ԱՆՁՆԱԳՐՈՎ ՄԱՍՆԱԿԻՑ ԱՐԴԵՆ ԿԱ');
             	}
-
-            	console.log($resp);
             	$('.loader').remove();
             }
         });
@@ -161,14 +178,11 @@ $(function(){
 				client_info += '<input class="form-control" name="surname" type="text" value="' + client.surname + '">';
 			client_info += '</div>';
 
-			client_info += '<div class="text-center w w-25">';
+			client_info += '<div class="text-center w w-50">';
 				client_info += '<input id="datepicker_dob" class="form-control" name="birth_date" type="text" placeholder="Ծննդյան ամսաթիվ" value="' + (client.birth_date ? client.birth_date : "") + '">';
 			client_info += '</div>';
 			client_info += '<div class="text-center w w-50">';
 				client_info += '<input class="form-control" name="passport_id" placeholder="Անձնագրի սերիա" type="text" value="' + (client.passport_id ? client.passport_id : "") + '">';
-			client_info += '</div>';
-			client_info += '<div class="text-center w w-25">';
-				client_info += '<input id="datepicker_pass" class="form-control" name="passport_given_date" placeholder="Տրման ամսաթիվ" type="text" value="' + (client.passport_given_date ? client.passport_given_date : "") + '">';
 			client_info += '</div>';
 			
 		client_info += '</div>';
@@ -213,12 +227,15 @@ $(function(){
 		var gift_info = '';
 		var shop_id;
 		var check;
+		var counter = 1;
 		window.max_gifts = size(data.reserved_gifts);
 
 		$.each(gifts, function(key, value){
+
 			checked  = false;
 			reserved = false;
 			class_name = 'unavailable';
+
 			if(data.taken_gifts[value.id] !== undefined){
 				class_name = 'taken';
 				checked = true;
