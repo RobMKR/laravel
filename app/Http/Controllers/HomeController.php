@@ -103,6 +103,7 @@ class HomeController extends Controller
             $slip->client_id = $client['id'];
             $slip->week_id = $week_id;
             $slip->slip_count = $request->count;
+            $slip->shop_id = $request->shop_id;
 
             $slip->save();
 
@@ -136,7 +137,10 @@ class HomeController extends Controller
                 $msg .= ', Հաճախորդը հավաքեց պահանջված միավորների քանակ';
             }
 
-            $slip->increment('slip_count', (int) $request->count);                                  
+            $slip->increment('slip_count', (int) $request->count);
+            
+            $slip->shop_id = $request->shop_id;
+            $slip->save();                                  
         }
 
         return response()->json(['status' => 200, 'msg' => $msg]);

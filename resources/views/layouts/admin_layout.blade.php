@@ -17,19 +17,23 @@
     <link href="/css/font-awesome.min.css" rel="stylesheet">
 
     <link href="/css/magnific-popup.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/buttons.bootstrap.min.css">
 
 
     <!-- Scripts -->
     <script src="/js/jquery.js"></script>
     <script src="/js/msg.js"></script>
-    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-    <script src="https://cdn.socket.io/socket.io-1.3.4.js"></script>
-
+    
     <script>
         window.Laravel = <?php echo json_encode([
             'csrfToken' => csrf_token(),
         ]); ?>
     </script>
+
+
+    <script src="/js/jquery.magnific-popup.min.js"></script>
 </head>
 <body>
     <nav class="navbar navbar-default navbar-static-top nav-admin">
@@ -77,6 +81,8 @@
                         </a>
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="{{url('/admin/giftShops')}}" role="button">Gifts in Shops</a></li>
+                            <li><a href="{{url('/admin/overallCounts')}}" role="button">Gift Overall Counts</a></li>
+                            <li><a href="{{url('/admin/overallByClient')}}" role="button">Overall By Consumers</a></li>
                         </ul>
                     </li>
                     <li class="dropdown">
@@ -139,6 +145,10 @@
 
     @yield('content')
     <script src="/js/app.js"></script>
-    <script src="/js/jquery.magnific-popup.min.js"></script>
+    
+    <script type="text/javascript" src="/js/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="/js/buttons.html5.min.js"></script>
 </body>
 </html>

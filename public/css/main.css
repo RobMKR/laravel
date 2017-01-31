@@ -185,3 +185,13 @@ td a {
     max-height: 450px;
     margin: 15px 0;
 }
+.overall-table {
+    padding: 15px;
+    background: #fff;
+    margin: 15px 0;
+}
+.dt-button {
+    padding: 5px;
+    border: 1px solid;
+    margin: 0 15px;
+}

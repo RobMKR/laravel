@@ -8,6 +8,7 @@ use App\Http\Requests;
 use App\Shop;
 use App\Gift;
 use App\ShopGift;
+use App\Client;
 use App\Slip;
 use App\ClientGift;
 use App\Week;
@@ -16,6 +17,7 @@ use DB;
 use Session;
 use \GuzzleHttp;
 use \Exception;
+use \DateTime;
 class CountController extends Controller
 {
     public function giftShops(){
@@ -133,6 +135,9 @@ class CountController extends Controller
     }
 
     public function sendSmsSendbox(Request $request){
+
+        throw new Exception('Not Ready To Sendbox');
+        
 
         $week_id = $request->week;
 
@@ -335,5 +340,146 @@ class CountController extends Controller
         return redirect()->back();
 
         /*************************************************************************************/
+    }
+
+    public function overallCounts(Request $request){
+        $clients = Shop::join('client_gift_weeks', 'client_gift_weeks.shop_id', '=', 'shops.id')
+            ->join('weeks', 'weeks.id', '=', 'client_gift_weeks.week_id')
+            ->join('clients', 'clients.id', '=', 'client_gift_weeks.client_id')
+            ->leftJoin('gifts as ReservedGifts', 'ReservedGifts.id', '=', 'client_gift_weeks.reserved_id')
+            ->leftJoin('gifts as TakenGifts', 'TakenGifts.id', '=', 'client_gift_weeks.gift_id')
+            ->select(
+                'shops.id as ShopId',
+                'shops.short_name as ShopName',
+                'weeks.id as WeekId',
+                'weeks.start as WeekStart',
+                'weeks.end as WeekEnd',
+                'clients.name as ClientName',
+                'clients.surname as ClientSurname',
+                'clients.phone as ClientPhone',
+                'client_gift_weeks.reserved_id as ReservedId',
+                'client_gift_weeks.gift_id as TakenId',
+                'ReservedGifts.icon_class as ReservedIcon',
+                'TakenGifts.icon_class as TakenIcon'
+            )
+            ->orderBy('weeks.id', 'DESC')
+            ->orderBy('shops.short_name', 'ASC')
+            ->get();
+
+        $clients_sorted = [];
+        foreach($clients as $_key => $_client){
+            if(!isset($clients_sorted[$_client->WeekId]['shops'][$_client->ShopId]['shop_info'])){
+                $clients_sorted[$_client->WeekId]['shops'][$_client->ShopId]['shop_info'] = $_client->ShopName;
+            }
+
+            if(!isset($clients_sorted[$_client->WeekId]['week_info']['number'])){
+
+                $date = new DateTime($_client->WeekStart . ' + 1 day');
+                $clients_sorted[$_client->WeekId]['week_info']['start'] = $_client->WeekStart;
+                $clients_sorted[$_client->WeekId]['week_info']['end'] = $_client->WeekEnd;
+                $clients_sorted[$_client->WeekId]['week_info']['number'] = $date->format("Y") . ' - ' . $date->format("W");
+            }
+
+            if(!isset($clients_sorted[$_client->WeekId]['shops'][$_client->ShopId]['counts'])){
+                $clients_sorted[$_client->WeekId]['shops'][$_client->ShopId]['counts'] = [
+                    'reserved' => [],
+                    'taken' => [],
+                    'ready' => [],
+                    'not_accepted' => [],
+                ];
+            }
+
+            if($_client->ReservedId === 0 && $_client->TakenId === null){
+                $clients_sorted[$_client->WeekId]['shops'][$_client->ShopId]['counts']['not_accepted'][] = $_key;
+            }else if($_client->ReservedId !== null && $_client->TakenId === null){
+                $clients_sorted[$_client->WeekId]['shops'][$_client->ShopId]['counts']['reserved'][] = $_key;
+            }else if($_client->ReservedId !== null && $_client->TakenId !== null){
+                $clients_sorted[$_client->WeekId]['shops'][$_client->ShopId]['counts']['taken'][] = $_key;
+            }else if($_client->ReservedId === null && $_client->TakenId === null){
+                $clients_sorted[$_client->WeekId]['shops'][$_client->ShopId]['counts']['ready'][] = $_key;
+            }
+        }
+
+        return view('/admin/overallCounts')->with('data', $clients_sorted);
+    }
+
+    public function overallByClient(Request $request){
+        $clients = Slip::join('clients', 'clients.id', '=', 'client_week_slips.client_id')
+            ->join('weeks', 'weeks.id', '=', 'client_week_slips.week_id')
+            ->leftJoin('shops', 'client_week_slips.shop_id', '=', 'shops.id')
+            ->leftJoin('client_gift_weeks', function($join){
+                $join->on('client_gift_weeks.shop_id', '=', 'shops.id');
+                $join->on('client_gift_weeks.client_id', '=', 'clients.id');
+            })
+            ->leftJoin('gifts', 'gifts.id', '=', 'client_gift_weeks.reserved_id')
+            ->select(
+                'clients.id as ClientId',
+                'clients.name as ClientName',
+                'clients.surname as ClientSurname',
+                'clients.phone as ClientPhone',
+                'clients.passport_id as ClientPassport',
+                'clients.birth_date as ClientBirthDate',
+                'client_week_slips.slip_count as SlipCount',
+                'client_week_slips.shop_id as ShopId',
+                'shops.short_name as ShopName',
+                'weeks.id as WeekId',
+                'weeks.start as WeekStart',
+                'weeks.end as WeekEnd',
+                'client_gift_weeks.reserved_id as ReservedId',
+                'client_gift_weeks.gift_id as TakenId',
+                'gifts.id as GiftId',
+                'gifts.name as GiftName'
+            )
+            ->orderBy('ShopName', 'DESC')
+            ->get();
+
+        $weeks = Week::where( DB::raw('YEAR(created_at)'), '>', '2016' )->get();
+
+        foreach($weeks as $_week){
+            $date = new DateTime($_week->start . ' + 1 day');
+            $viewData['weeks'][$_week->id]['num'] = $date->format("W");
+            $viewData['weeks'][$_week->id]['start'] = $_week->start;
+            $viewData['weeks'][$_week->id]['end'] = $_week->end;
+        }
+
+        $viewData['gifts'] = Gift::get();
+
+        foreach($clients as $_client){
+            $clients_sorted[$_client->ClientId]['client']['name'] = $_client->ClientName;
+            $clients_sorted[$_client->ClientId]['client']['surname'] = $_client->ClientSurname;
+            $clients_sorted[$_client->ClientId]['client']['phone'] = $_client->ClientPhone;
+            $clients_sorted[$_client->ClientId]['client']['passport'] = $_client->ClientPassport; 
+            $clients_sorted[$_client->ClientId]['client']['birth_date'] = $_client->ClientBirthDate;
+            $clients_sorted[$_client->ClientId]['shop'] = $_client->ShopName ?: 'Undefined';
+
+            $date = new DateTime($_client->WeekStart . ' + 1 day');
+            $clients_sorted[$_client->ClientId]['weeks'][$_client->WeekId]['week_info']['start'] = $_client->WeekStart;
+            $clients_sorted[$_client->ClientId]['weeks'][$_client->WeekId]['week_info']['end'] = $_client->WeekEnd;
+            $clients_sorted[$_client->ClientId]['weeks'][$_client->WeekId]['week_info']['number']  = $date->format("Y") . ' - ' . $date->format("W");
+            $clients_sorted[$_client->ClientId]['weeks'][$_client->WeekId]['slip_count'] = $_client->SlipCount;
+
+            if($_client->ReservedId !== null && $_client->ReservedId !== 0 && $_client->TakenId === null){
+                $clients_sorted[$_client->ClientId]['gifts'][$_client->ReservedId] = 'R';
+            }else if($_client->ReservedId !== null && $_client->TakenId !== null){
+                $clients_sorted[$_client->ClientId]['gifts'][$_client->TakenId] = 'T';
+            }else{
+                $clients_sorted[$_client->ClientId]['gifts'] = [];
+            }
+        }
+
+        // dd($clients_sorted);
+
+        $viewData['clients'] = $clients_sorted;
+
+        return view('/admin/overallByClient')->with('data', $viewData);
+    }
+
+    public function fixData(){
+        $clients = ClientGift::get();
+        foreach($clients as $_client){
+            $slip = Slip::where('week_id', $_client->week_id)->where('client_id', $_client->client_id)->first();
+            $slip->shop_id = $_client->shop_id;
+            $slip->save();
+        }
     }
 }
