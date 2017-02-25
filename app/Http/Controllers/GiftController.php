@@ -10,6 +10,7 @@ use Session;
 use App\Gift;
 use App\Shop;
 use App\ShopGift;
+use DB;
 
 class GiftController extends Controller
 {
@@ -103,11 +104,23 @@ class GiftController extends Controller
     	$shops = Shop::pluck('short_name', 'id');
     	$gifts = Gift::pluck('name', 'id');
 
+    	$counts = ShopGift::join('shops', 'shops.id', '=', 'shop_gifts.shop_id')
+            ->join('gifts', 'gifts.id', '=', 'shop_gifts.gift_id')
+            ->orderBy('shops.short_name')
+            ->select('shops.id as shop_id', 'gifts.id as gift_id', 'shop_gifts.count as count')
+            ->get();
+
+        $new_counts = [];
+
+        foreach($counts as $_count){
+        	$new_counts[$_count->shop_id][$_count->gift_id] = $_count->count;
+        }
+
     	if(strpos(\URL::previous(), 'giftShops') !== false){
     		Session::flash('prev', 'admin/giftShops');
     	}
 
-    	return view('admin/assignGift')->with('data', ['shops' => $shops, 'gifts' => $gifts]);
+    	return view('admin/assignGift')->with('data', ['shops' => $shops, 'gifts' => $gifts, 'counts' => $new_counts]);
     }
 
     public function assignPost(Request $request){

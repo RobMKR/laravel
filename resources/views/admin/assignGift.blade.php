@@ -17,14 +17,36 @@
                 {!! Form::select('gift_id',$data['gifts'],Request::get('g'), array('class' =>'form-control', 'placeholder' => 'Select Gift')) !!}
             </div>
             <div class="text-center col-md-12">
-                {!! Form::text('count','', array('class' =>'form-control' , 'placeholder' => 'Select Gift Count')) !!}
+                {!! Form::text('count', isset($data['counts'][Request::get('s')][Request::get('g')]) ? $data['counts'][Request::get('s')][Request::get('g')] : null , array('class' =>'form-control' , 'placeholder' => 'Select Gift Count')) !!}
             </div>
             <div class="text-center col-md-12">
-                {!! Form::submit('Add Gifts To Shop', array('class' => 'btn btn-primary')) !!}
+                {!! Form::submit('Save', array('class' => 'btn btn-primary')) !!}
             </div>
             
         </div>
         {!! Form::close() !!}
     </div>
     
+    <script type="text/javascript">  
+        $(document).ready(function(){
+            var count = '<?php echo json_encode($data["counts"]); ?>';
+            count = JSON.parse(count);
+            
+            $('select').change(function(){
+                var shop = $('select[name="shop_id"]').val();
+                var gift = $('select[name="gift_id"]').val();
+
+                if(shop == "" || gift == ""){
+                    $('input[name="count"]').val('');
+                    return false;
+                }
+
+                if(count[shop] != undefined && count[shop][gift] != undefined){
+                    $('input[name="count"]').val(count[shop][gift]);
+                    return false;
+                }
+            });
+        });
+    </script>
+
 @endsection

@@ -61,6 +61,7 @@
             $('#datatable').DataTable({
                 "scrollX": true,
                 dom: 'Bfrtip',
+                pageLength: 200,
                 buttons: [
                     'excelHtml5',
                     'csvHtml5',

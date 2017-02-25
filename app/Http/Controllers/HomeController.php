@@ -40,7 +40,7 @@ class HomeController extends Controller
                     break;
             }
 
-            return redirect($this->redirectAfter);
+            return redirect($this->redirectAfter); 
         }
         return view('welcome');
     }
@@ -192,8 +192,7 @@ class HomeController extends Controller
             'name' => 'required',
             'surname' => 'required',
             'birth_date' => 'required',
-            'passport_id' => 'required|unique:clients,passport_id,' . $id,
-            'passport_given_date' => 'required',
+            'passport_id' => 'required|unique:clients,passport_id,' . $id
         ]);
 
         $client->name = $request->name;

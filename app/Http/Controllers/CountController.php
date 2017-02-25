@@ -135,17 +135,26 @@ class CountController extends Controller
     }
 
     public function sendSmsSendbox(Request $request){
-
-        throw new Exception('Not Ready To Sendbox');
-        
-
+        // Get Week Id
         $week_id = $request->week;
 
         $client_gifts = ClientGift::where('week_id', $week_id)
             ->whereNull('gift_id')
             ->whereNull('reserved_id')
+            ->join('clients', 'clients.id', '=', 'client_gift_weeks.client_id')
+            ->join('shops', 'shops.id', '=', 'client_gift_weeks.shop_id')
+            ->select('client_gift_weeks.*',
+                'shops.full_name as ShopName',
+                'shops.time as time' ,
+                'clients.name as CName', 
+                'clients.surname as CSurName',
+                'clients.phone as CPhone')
             ->orderBy('last_slip_date', 'DESC')
             ->get();
+
+        if($client_gifts->isEmpty()){
+            throw new Exception("No Participants found in week");
+        }
 
         foreach($client_gifts as $client_gift){
             $gift_order = ClientGift::where('client_id', $client_gift->client_id)
@@ -154,12 +163,15 @@ class CountController extends Controller
                     $q->orWhereNotNull('reserved_id');
                 })
                 ->count() + 1;
-            $gift_id = Gift::where('week_order', $gift_order)->first()['id'];
-			if($gift_id == null){
-				$client_gift->reserved_id = 0;
+
+            $gift = Gift::where('week_order', $gift_order)->first();
+            $gift_id = isset($gift['id']) ? $gift['id'] : null;
+
+            if($gift_id == null){
+                $client_gift->reserved_id = 0;
                 $client_gift->save();
-				continue;
-			}
+                continue;
+            }
 
             $ShopGift = ShopGift::where('shop_id', $client_gift->shop_id)->where('gift_id', $gift_id)->first();
             if(($ShopGift->count - $ShopGift->used) > 0){
@@ -179,13 +191,13 @@ class CountController extends Controller
 
     public function sendSmsReal(Request $request){
         $week_id = $request->week;
-
+		/*
         /*************************************************************************************/
         $login_url = 'https://api.mobipace.com:444/v3/authorize';
         
         $fields = array(
-            'Username' => 'SUPER AKCIA',
-            'Password' => 'jti2016'
+            'Username' => str_replace('_', ' ', env('MOBI_USER')),
+            'Password' => env('MOBI_PASS')
         );
 
         $ch = curl_init($login_url);
@@ -200,8 +212,9 @@ class CountController extends Controller
         curl_setopt($ch,CURLOPT_POSTFIELDS, json_encode($fields));
 
         $output = json_decode(curl_exec ($ch));
-        if($output->StatusCode != 101){
-            throw new Exception("Cannot Send SMS, Contact to your developer as soon as possible");
+		
+		if($output->StatusCode != 101){
+             throw new Exception("Cannot Send SMS, Contact to your developer as soon as possible");
         }
 
         $session_id = $output->SessionId;
@@ -247,6 +260,7 @@ class CountController extends Controller
 			];
 		}
 		
+		
         $client_gifts = ClientGift::where('week_id', $week_id)
             ->whereNull('gift_id')
             ->whereNull('reserved_id')
@@ -260,6 +274,7 @@ class CountController extends Controller
                 'clients.phone as CPhone')
             ->orderBy('last_slip_date', 'DESC')
             ->get();
+			
         if($client_gifts->isEmpty()){
             throw new Exception("No Participants found in week");
         }
@@ -273,7 +288,7 @@ class CountController extends Controller
                 ->count() + 1;
 
             $gift = Gift::where('week_order', $gift_order)->first();
-			$gift_id = $gift['id'];
+			$gift_id = isset($gift['id']) ? $gift['id'] : null;
 
             if($gift_id == null){
                 // Case when already taken all gifts
@@ -311,6 +326,7 @@ class CountController extends Controller
                 // Case when gifts are 0
                 $sms_text = $sms_texts->sms_no_gift;
                 $sms_text = str_replace('[!NAME!]', $client_gift->CName . ' ' . $client_gift->CSurName, $sms_text);
+				$sms_text = str_replace('[!GIFT!]', $gift->name, $sms_text);
 
                 $sms_params['Messages'][] = [
                     'Recipient' => 374 . $client_gift->CPhone,
@@ -335,7 +351,7 @@ class CountController extends Controller
             throw new Exception("Cannot Send SMS, Contact to your developer as soon as possible");
             
         }
-
+		
         Session::flash('success', 'Gifts Reserved for consumers, Messages send');
         return redirect()->back();
 
@@ -430,6 +446,7 @@ class CountController extends Controller
                 'gifts.id as GiftId',
                 'gifts.name as GiftName'
             )
+            ->orderBy('client_week_slips.created_at', 'DESC')
             ->orderBy('ShopName', 'DESC')
             ->get();
 
@@ -475,11 +492,14 @@ class CountController extends Controller
     }
 
     public function fixData(){
-        $clients = ClientGift::get();
+        $clients = Slip::whereNull("shop_id")->get();
+        dd($clients);
         foreach($clients as $_client){
-            $slip = Slip::where('week_id', $_client->week_id)->where('client_id', $_client->client_id)->first();
-            $slip->shop_id = $_client->shop_id;
-            $slip->save();
+            $new_shop = Slip::where('client_id', $_client->client_id)->whereNotNull('shop_id')->first();
+            if($new_shop){
+                $_client->shop_id = $new_shop->shop_id;
+                $_client->save();
+            }
         }
     }
 }
