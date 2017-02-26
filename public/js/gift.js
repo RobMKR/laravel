@@ -248,7 +248,7 @@ $(function(){
 			gift_info += '<div class="gift-row ' + class_name + '">';
 				gift_info += '<div class="key"><span>' + key + '</span></div>'
 				gift_info += '<div class="icon"><span><i class="fa ' + value.icon_class + '"></i></span></div>';
-				gift_info += '<div class="name"><span>' + value.name + '</span></div>';
+				gift_info += '<div class="name"><span>' + value.name_trans + '</span></div>';
 				if(checked){
 					gift_info += '<div class="checkboxX"><input type="checkbox" name="gifts[]" value="' + value.id + '||' + shop_id + '" disabled/></div>';
 				}else{

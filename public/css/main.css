@@ -195,3 +195,12 @@ td a {
     border: 1px solid;
     margin: 0 15px;
 }
+.inline-loader {
+    min-height: 200px;
+    background: url(../img/popup_loader.gif) no-repeat;
+    background-position: 240px;
+}
+
+.sep-row {
+    display: block;
+}

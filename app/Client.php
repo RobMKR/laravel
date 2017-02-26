@@ -16,7 +16,7 @@ class Client extends Model
 
     public static function getByPhone($phone){
     	$client = self::where('phone', $phone)->first();
-    	return empty($client) ? null : $client;
+    	return $client;
     }
 
     public static function createImg($file){

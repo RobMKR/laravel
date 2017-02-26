@@ -189,6 +189,57 @@ class CountController extends Controller
 
     }
 
+    public function getAvailableGiftShops(Request $request){
+        $week_id = $request->get('week', 0);
+
+        $client_gifts = ClientGift::where('week_id', $week_id)
+            ->whereNull('gift_id')
+            ->whereNull('reserved_id')
+            ->join('clients', 'clients.id', '=', 'client_gift_weeks.client_id')
+            ->join('shops', 'shops.id', '=', 'client_gift_weeks.shop_id')
+            ->select('client_gift_weeks.*',
+                'shops.full_name as ShopName',
+                'shops.time as time' ,
+                'clients.name as CName',
+                'clients.surname as CSurName',
+                'clients.phone as CPhone')
+            ->orderBy('last_slip_date', 'DESC')
+            ->get();
+
+        if($client_gifts->isEmpty()){
+            throw new Exception("No Participants found in week");
+        }
+
+        foreach($client_gifts as $client_gift){
+
+            if(!isset($shops[$client_gift->ShopName])){
+                $shops[$client_gift->ShopName]['counts'] = [];
+            }
+
+            $gift_order = ClientGift::where('client_id', $client_gift->client_id)
+                    ->where(function($q){
+                        $q->whereNotNull('gift_id');
+                        $q->orWhereNotNull('reserved_id');
+                    })
+                    ->count() + 1;
+
+            $gift = Gift::where('week_order', $gift_order)->first();
+            $gift_id = isset($gift['id']) ? $gift['id'] : null;
+
+            if($gift_id == null){
+                continue;
+            }
+
+            if(!isset($shops[$client_gift->ShopName]['counts'][$gift->name])){
+                $shops[$client_gift->ShopName]['counts'][$gift->name] = 1;
+            }else{
+                $shops[$client_gift->ShopName]['counts'][$gift->name] = $shops[$client_gift->ShopName]['counts'][$gift->name] + 1;
+            }
+        }
+
+        return response(['success' => true, 'shops' => $shops]);
+    }
+
     public function sendSmsReal(Request $request){
         $week_id = $request->week;
 		/*
@@ -484,22 +535,12 @@ class CountController extends Controller
             }
         }
 
-        // dd($clients_sorted);
-
         $viewData['clients'] = $clients_sorted;
 
         return view('/admin/overallByClient')->with('data', $viewData);
     }
 
     public function fixData(){
-        $clients = Slip::whereNull("shop_id")->get();
-        dd($clients);
-        foreach($clients as $_client){
-            $new_shop = Slip::where('client_id', $_client->client_id)->whereNotNull('shop_id')->first();
-            if($new_shop){
-                $_client->shop_id = $new_shop->shop_id;
-                $_client->save();
-            }
-        }
+
     }
 }

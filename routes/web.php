@@ -63,8 +63,9 @@ Route::group(['middleware' => ['admin']], function () {
 
     Route::get('/admin/sendSmsSandbox', 'CountController@sendSmsSendbox');
     Route::get('/admin/sendSmsReal', 'CountController@sendSmsReal');
-
     Route::get('/admin/fixData', 'CountController@fixData');
+
+    Route::get('/admin/getAvailableGiftShops', 'CountController@getAvailableGiftShops');
 });
 
 Route::group(['middleware' => ['slip']], function () {

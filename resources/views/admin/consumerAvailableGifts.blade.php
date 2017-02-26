@@ -54,26 +54,99 @@
 
         @endif
     </div>
+
+    <div id="available-gifts-popup" class="mgnPopup mfp-hide">
+        <div class="container" style="width: 100%;">
+            <div class="inline-loader">
+
+            </div>
+        </div>
+        <div class="btn-group">
+            <a id="send" class="btn-default btn">Send</a>
+        </div>
+    </div>
+
     <script type="text/javascript">
-        $(function(){
+        $(document).ready(function(){
+            var week;
+            var url;
+
             $('.weeks').on('change', function(){
-                console.log($(this).val());
+                week = $(this).val();
                 $('tr[data-week]').css('background-color', '#fff');
                 $('tr[data-week="' + $(this).val() + '"]').css('background-color', '#abd9ab');
-
             });
 
             $('.sms a').click(function(e){
+                url = $(this).attr('href');
                 e.preventDefault();
-                var week = $('.weeks').val()
+
                 if(week == ''){
                     alert('Select Week');
                     return false;
                 }
 
-                var href = $(this).attr('href') + '?week=' + week;
-                window.location = href;
+                $.magnificPopup.open({
+                    items : {
+                        src : '#available-gifts-popup'
+                    },
+                    type : 'inline'
+                });
+
+                $.ajax({
+                    url : '/admin/getAvailableGiftShops',
+                    data : {
+                        week : week
+                    },
+                    success : function (response) {
+                        if(response.success){
+                            drawResults(response.shops);
+                            $('#send').attr('href', url + '?week=' + week);
+                        }
+                    }
+                });
+
+                return false;
             });
+
+            $('.sms a').click(function(e){
+//                e.preventDefault();
+//                var week = $('.weeks').val()
+//                if(week == ''){
+//                    alert('Select Week');
+//                    return false;
+//                }
+//
+//                var href = $(this).attr('href') + '?week=' + week;
+//                window.location = href;
+            });
+
+            function drawResults(shops) {
+                var container = $('#available-gifts-popup .container');
+                var html = '<table class="table table-bordered">';
+
+                for(var shop in shops){
+                    html += '<tr>';
+                    html += '<td>';
+                    html += shop;
+                    html += '</td>';
+                    html += '<td>';
+                    console.log(shops[shop]);
+                        for(var gift in shops[shop]['counts']){
+                            html += '<span class="sep-row">';
+                            html += gift + ' - ' + shops[shop]['counts'][gift];
+                            html += '</span>';
+                        }
+                    html += '</td>';
+                    html += '</tr>';
+                }
+
+                html += '</table>';
+
+                container.html(html);
+            }
+
+
         });
     </script>
 @endsection

@@ -17,9 +17,7 @@ class HomeController extends Controller
     protected $redirectAfter = '/';
 
     /**
-     * Create a new controller instance.
-     *
-     * @return void
+     * Create a new controller instance.     *
      */
     public function __construct()
     {
@@ -79,8 +77,13 @@ class HomeController extends Controller
                 'time' => 'required'
             ]);
 
-            $client = new Client();
-            $client->phone = $request->phone;
+            $client = Client::getByPhone($request->phone);
+
+            if($client === null){
+                $client = new Client();
+                $client->phone = $request->phone;
+            }
+
             $client->name = $request->name;
             $client->surname = $request->surname;
 
@@ -124,6 +127,14 @@ class HomeController extends Controller
         }else{
             $overall = $slip->slip_count + (int) $request->count;
             $msg = 'Կտրոնների քանակ : ' . $overall;
+
+            if($slip->slip_count >= 7){
+                $ClientGift = ClientGift::where('client_id', $client->id)->where('week_id', $week_id)->first();
+                if($ClientGift){
+                    $ClientGift->shop_id = $request->shop_id;
+                    $ClientGift->save();
+                }
+            }
 
             if($slip->slip_count < 7 && $overall > 6){
                 $ClientGift = new ClientGift();
