@@ -23,7 +23,11 @@
 
 
     <!-- Scripts -->
-    <script src="/js/jquery.js"></script>
+    {{--<script src="/js/jquery.js"></script> --}}
+	<script
+  src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous"></script>
     <script src="/js/msg.js"></script>
     
     <script>
@@ -32,7 +36,7 @@
         ]); ?>
     </script>
 
-
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
     <script src="/js/jquery.magnific-popup.min.js"></script>
 </head>
 <body>
